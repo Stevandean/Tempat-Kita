@@ -1,0 +1,17 @@
+<resources>
+    <!-- Warna Utama (Biru) -->
+    <color name="primary">#1565C0</color> <!-- Biru sedang, nyaman di mata -->
+    <color name="primary_dark">#0D47A1</color> <!-- Biru tua, untuk toolbar / status bar -->
+    <color name="primary_light">#5E92F3</color> <!-- Biru muda, untuk aksen atau hover -->
+
+    <!-- Warna Sekunder dan Pendukung -->
+    <color name="accent">#64B5F6</color> <!-- Biru lembut untuk tombol sekunder -->
+    <color name="teal_700">#0288D1</color> <!-- Cocok untuk tombol seperti 'Lihat Peta' -->
+
+    <!-- Warna Umum -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray">#F5F5F5</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+</resources>
