@@ -3,8 +3,6 @@ package com.example.tempatkita.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,7 +12,7 @@ import com.example.tempatkita.R;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DURATION = 2500; // 2.5 detik
+    private static final int SPLASH_DURATION = 2500; // durasi total splash 2.5 detik
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,18 +22,25 @@ public class SplashActivity extends AppCompatActivity {
         ImageView logo = findViewById(R.id.logoImage);
         TextView appName = findViewById(R.id.appName);
 
-        // Animasi Fade In
-        Animation fadeIn = new AlphaAnimation(0f, 1f);
-        fadeIn.setDuration(1000);
-        fadeIn.setFillAfter(true);
+        // Pastikan mulai dalam keadaan transparan
+        logo.setAlpha(0f);
+        appName.setAlpha(0f);
 
-        logo.startAnimation(fadeIn);
+        // Fade-in logo
+        logo.animate()
+                .alpha(1f)
+                .setDuration(1000)
+                .setStartDelay(200)
+                .start();
 
-        new Handler().postDelayed(() -> {
-            appName.startAnimation(fadeIn);
-        }, 500);
+        // Fade-in teks setelah logo muncul
+        appName.animate()
+                .alpha(1f)
+                .setDuration(1000)
+                .setStartDelay(700)
+                .start();
 
-        // Pindah ke MainActivity setelah delay
+        // Setelah semua selesai, pindah ke MainActivity
         new Handler().postDelayed(() -> {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

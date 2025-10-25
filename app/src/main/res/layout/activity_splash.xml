@@ -1,9 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/background">
 
-    <!-- Logo -->
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="120dp"
@@ -12,17 +11,15 @@
         android:contentDescription="@string/app_name"
         android:layout_centerInParent="true" />
 
-    <!-- Nama Aplikasi -->
     <TextView
         android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tempat Kita"
         android:textSize="26sp"
-        android:textColor="@color/primary"
+        android:textColor="@color/text_primary"
         android:textStyle="bold"
         android:layout_below="@id/logoImage"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp" />
-
 </RelativeLayout>

@@ -1,10 +1,17 @@
 package com.example.tempatkita.ui;
 
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private WisataAdapter adapter;
-    private List<Wisata> wisataList;
-    private List<Wisata> filteredList;
+    private final List<Wisata> wisataList = new ArrayList<>();
+    private final List<Wisata> filteredList = new ArrayList<>();
 
     private static final int PAGE_SIZE = 10;
     private int currentPage = 1;
@@ -31,31 +38,73 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 🔹 Toolbar setup
-//        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setTitle("🌴 Info Pariwisata Indonesia");
-//        }
+        setupSearchView();
+        setupRecyclerView();
+        setupLoadMoreButton();
+    }
 
-        // 🔹 Inisialisasi komponen
-        recyclerView = findViewById(R.id.recyclerViewWisata);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-
-        wisataList = getWisataList();
-        filteredList = new ArrayList<>();
-
-        // Tampilkan halaman pertama (10 item)
-        int end = Math.min(PAGE_SIZE, wisataList.size());
-        filteredList.addAll(wisataList.subList(0, end));
-
-        adapter = new WisataAdapter(filteredList);
-        recyclerView.setAdapter(adapter);
-
-        // 🔹 Setup SearchView
+    /** 🔍 Setup SearchView di Light & Dark Mode */
+    private void setupSearchView() {
         SearchView searchView = findViewById(R.id.searchView);
+        if (searchView == null) return;
+
+        searchView.setIconifiedByDefault(false);
         searchView.clearFocus();
+        searchView.setQueryHint("Mau berlibur ke mana?");
+
+        // Deteksi apakah sedang di Dark Mode
+        boolean isDarkMode = (getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+
+        // Ambil warna dari resources
+        int backgroundColor = ContextCompat.getColor(this, R.color.surface);
+        int textColor = ContextCompat.getColor(this, R.color.text_primary);
+        int hintColor = ContextCompat.getColor(this, R.color.text_secondary);
+        int iconColor = ContextCompat.getColor(this, R.color.text_primary);
+
+        // Ubah background SearchView
+        searchView.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
+
+        try {
+            // Background input field (search plate)
+            int plateId = searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_plate", null, null);
+            View plate = searchView.findViewById(plateId);
+            if (plate != null) {
+                plate.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
+            }
+
+            // Text input
+            int textId = searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_src_text", null, null);
+            TextView textView = searchView.findViewById(textId);
+            if (textView != null) {
+                textView.setTextColor(textColor);
+                textView.setHintTextColor(hintColor);
+                textView.setHint("Mau berlibur ke mana?");
+                textView.setTextSize(15);
+            }
+
+            // Ikon search
+            int iconId = searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_mag_icon", null, null);
+            ImageView icon = searchView.findViewById(iconId);
+            if (icon != null) {
+                icon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+            }
+
+            // Ikon close
+            int closeId = searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_close_btn", null, null);
+            ImageView closeIcon = searchView.findViewById(closeId);
+            if (closeIcon != null) {
+                closeIcon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Listener pencarian
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -69,20 +118,37 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
 
-        // 🔹 Tombol Load More
+    /** Setup RecyclerView dan tampilkan data */
+    private void setupRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerViewWisata);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        wisataList.addAll(getWisataList());
+        int end = Math.min(PAGE_SIZE, wisataList.size());
+        filteredList.addAll(wisataList.subList(0, end));
+
+        adapter = new WisataAdapter(filteredList);
+        recyclerView.setAdapter(adapter);
+    }
+
+    /** Tombol Load More */
+    private void setupLoadMoreButton() {
         MaterialButton btnLoadMore = findViewById(R.id.btnLoadMore);
         btnLoadMore.setOnClickListener(v -> loadMore());
     }
 
-    // 🔹 Fungsi untuk filter pencarian
-    private void filterList(String text) {
+    /** Filter daftar wisata berdasarkan input */
+    private void filterList(String query) {
         filteredList.clear();
-        if (text.isEmpty()) {
-            filteredList.addAll(wisataList.subList(0, Math.min(currentPage * PAGE_SIZE, wisataList.size())));
+        if (query.isEmpty()) {
+            int end = Math.min(currentPage * PAGE_SIZE, wisataList.size());
+            filteredList.addAll(wisataList.subList(0, end));
         } else {
             for (Wisata w : wisataList) {
-                if (w.getNama().toLowerCase().contains(text.toLowerCase())) {
+                if (w.getNama().toLowerCase().contains(query.toLowerCase())) {
                     filteredList.add(w);
                 }
             }
@@ -90,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    // 🔹 Fungsi pagination
+    /** Pagination (load lebih banyak data) */
     private void loadMore() {
         int start = currentPage * PAGE_SIZE;
         int end = Math.min(start + PAGE_SIZE, wisataList.size());
@@ -103,10 +169,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 🔹 Data wisata asli (dummy manual, tapi nyata)
+    /** Data wisata dummy */
     private List<Wisata> getWisataList() {
         List<Wisata> list = new ArrayList<>();
-
         list.add(new Wisata("Candi Borobudur", "Magelang, Jawa Tengah", R.drawable.hero));
         list.add(new Wisata("Candi Prambanan", "Sleman, Yogyakarta", R.drawable.ic_launcher_foreground));
         list.add(new Wisata("Gunung Bromo", "Probolinggo, Jawa Timur", R.drawable.ic_launcher_foreground));
@@ -117,51 +182,16 @@ public class MainActivity extends AppCompatActivity {
         list.add(new Wisata("Pantai Kuta", "Bali", R.drawable.ic_launcher_foreground));
         list.add(new Wisata("Pantai Parangtritis", "Yogyakarta", R.drawable.ic_launcher_foreground));
         list.add(new Wisata("Pulau Derawan", "Kalimantan Timur", R.drawable.ic_launcher_foreground));
-
-        list.add(new Wisata("Gunung Rinjani", "Lombok, Nusa Tenggara Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Labuan Bajo", "Flores, Nusa Tenggara Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Pink", "Lombok Timur", R.drawable.ic_launcher_foreground));
         list.add(new Wisata("Tana Toraja", "Sulawesi Selatan", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Taman Nasional Ujung Kulon", "Banten", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Samosir", "Sumatera Utara", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Curug Cimahi", "Bandung Barat, Jawa Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Anyer", "Serang, Banten", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Kepulauan Seribu", "DKI Jakarta", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Taman Mini Indonesia Indah", "Jakarta Timur", R.drawable.ic_launcher_foreground));
-
+        list.add(new Wisata("Pulau Weh", "Aceh", R.drawable.ic_launcher_foreground));
+        list.add(new Wisata("Labuan Bajo", "Flores, NTT", R.drawable.ic_launcher_foreground));
         list.add(new Wisata("Bukit Tinggi", "Sumatera Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Losari", "Makassar, Sulawesi Selatan", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Merapi", "Yogyakarta", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Balekambang", "Malang, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Candi Mendut", "Magelang, Jawa Tengah", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Sanur", "Denpasar, Bali", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Goa Pindul", "Gunungkidul, Yogyakarta", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Taman Nasional Baluran", "Situbondo, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Semeru", "Lumajang, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Tanjung Tinggi", "Belitung", R.drawable.ic_launcher_foreground));
-
-        list.add(new Wisata("Pulau Weh", "Sabang, Aceh", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Benteng Rotterdam", "Makassar", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Kawah Putih", "Ciwidey, Bandung", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Taman Safari Indonesia", "Bogor, Jawa Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Papandayan", "Garut, Jawa Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Pandawa", "Bali", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Bukit Bintang", "Gunungkidul, Yogyakarta", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Air Terjun Madakaripura", "Probolinggo, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Kampung Naga", "Tasikmalaya, Jawa Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Lembah Harau", "Sumatera Barat", R.drawable.ic_launcher_foreground));
-
-        list.add(new Wisata("Pantai Ora", "Maluku Tengah", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Kelimutu", "Ende, Flores", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Nihiwatu", "Sumba Barat", R.drawable.ic_launcher_foreground));
         list.add(new Wisata("Pulau Belitung", "Kepulauan Bangka Belitung", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Tanjung Lesung", "Pandeglang, Banten", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Candi Sewu", "Klaten, Jawa Tengah", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Air Terjun Sipiso-piso", "Karo, Sumatera Utara", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Tidung", "Kepulauan Seribu", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Danau Kelimutu", "Nusa Tenggara Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Lawu", "Karanganyar, Jawa Tengah", R.drawable.ic_launcher_foreground));
-
+        list.add(new Wisata("Pulau Samosir", "Sumatera Utara", R.drawable.ic_launcher_foreground));
+        list.add(new Wisata("Taman Nasional Baluran", "Banyuwangi, Jawa Timur", R.drawable.ic_launcher_foreground));
+        list.add(new Wisata("Pantai Pink", "Lombok Timur", R.drawable.ic_launcher_foreground));
+        list.add(new Wisata("Pulau Menjangan", "Bali Barat", R.drawable.ic_launcher_foreground));
+        list.add(new Wisata("Gunung Rinjani", "Lombok, NTB", R.drawable.ic_launcher_foreground));
         return list;
     }
 }

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".ui.MainActivity">
 
     <androidx.core.widget.NestedScrollView
@@ -32,7 +32,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#66000000" />
+                    android:background="@color/overlay" />
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -45,16 +45,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Temukan Keindahan Indonesia"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/text_hero_title"
                         android:textStyle="bold"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        tools:ignore="HardcodedText" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Eksplor destinasi wisata terbaik dari Sabang sampai Merauke"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/text_hero_subtitle"
                         android:gravity="center"
                         android:layout_marginTop="@dimen/margin_small"/>
@@ -68,15 +69,17 @@
                 android:layout_marginHorizontal="@dimen/margin_screen"
                 android:layout_marginTop="@dimen/search_overlap_margin"
                 android:layout_marginBottom="16dp"
-                android:elevation="@dimen/card_elevation"
-                app:cardCornerRadius="@dimen/card_corner_radius">
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                android:backgroundTint="@color/surface"
+                app:cardElevation="@dimen/card_elevation">
 
                 <androidx.appcompat.widget.SearchView
                     android:id="@+id/searchView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:queryHint="Cari destinasi wisata..."
+                    android:queryHint="Mau berlibur ke mana?"
                     android:iconifiedByDefault="false"
+                    android:background="@color/surface"
                     android:padding="@dimen/padding_small" />
             </com.google.android.material.card.MaterialCardView>
 

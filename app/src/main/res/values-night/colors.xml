@@ -1,0 +1,21 @@
+<resources>
+    <!-- Warna Utama (Tetap biru, tapi sedikit lebih gelap) -->
+    <color name="primary">#90CAF9</color> <!-- Biru lembut -->
+    <color name="primary_dark">#42A5F5</color>
+    <color name="primary_light">#BBDEFB</color>
+
+    <!-- Warna Sekunder -->
+    <color name="accent">#64B5F6</color>
+    <color name="teal_700">#4FC3F7</color>
+
+    <!-- Warna Umum -->
+    <color name="white">#121212</color>
+    <color name="black">#FFFFFF</color>
+    <color name="gray">#1E1E1E</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#BDBDBD</color>
+
+    <color name="background">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="overlay">#33FFFFFF</color>
+</resources>

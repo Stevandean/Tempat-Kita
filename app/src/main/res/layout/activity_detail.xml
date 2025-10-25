@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/padding_screen"
-    android:background="@color/white">
+    android:background="@color/background">
 
     <!-- Gambar -->
     <com.google.android.material.card.MaterialCardView
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:contentDescription="Gambar Tempat Wisata" />
+            android:contentDescription="@string/app_name" />
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Nama Wisata -->
@@ -57,7 +57,7 @@
         app:layout_constraintEnd_toEndOf="@id/textViewName"
         android:layout_marginTop="@dimen/margin_small" />
 
-    <!-- Deskripsi (scroll) -->
+    <!-- Deskripsi -->
     <ScrollView
         android:id="@+id/scrollDescription"
         android:layout_width="0dp"

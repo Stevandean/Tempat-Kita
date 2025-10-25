@@ -1,23 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.TempatKita" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- 🌈 Warna Utama -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/black</item>
 
-        <!-- 💧 Warna Sekunder -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
 
-        <!-- 🌗 Warna Background -->
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
 
-        <!-- 🧭 Warna teks -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
 
-        <!-- 📱 Status bar & navigasi -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
     </style>
