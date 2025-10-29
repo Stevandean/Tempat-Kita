@@ -1,10 +1,10 @@
 package com.example.tempatkita.ui;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,39 +12,44 @@ import com.example.tempatkita.R;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DURATION = 2500; // durasi total splash 2.5 detik
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        ImageView logo = findViewById(R.id.logoImage);
-        TextView appName = findViewById(R.id.appName);
+        VideoView videoView = findViewById(R.id.videoSplash);
 
-        // Pastikan mulai dalam keadaan transparan
-        logo.setAlpha(0f);
-        appName.setAlpha(0f);
+        // 🔍 Deteksi mode tampilan (dark atau light)
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
-        // Fade-in logo
-        logo.animate()
-                .alpha(1f)
-                .setDuration(1000)
-                .setStartDelay(200)
-                .start();
+        int videoResId;
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            // Jika mode gelap aktif
+            videoResId = R.raw.splash_dark;
+        } else {
+            // Jika mode terang aktif (default)
+            videoResId = R.raw.splash_light;
+        }
 
-        // Fade-in teks setelah logo muncul
-        appName.animate()
-                .alpha(1f)
-                .setDuration(1000)
-                .setStartDelay(700)
-                .start();
+        // 🔗 Arahkan ke video yang sesuai
+        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + videoResId);
+        videoView.setVideoURI(videoUri);
 
-        // Setelah semua selesai, pindah ke MainActivity
-        new Handler().postDelayed(() -> {
+        // ▶️ Putar video
+        videoView.start();
+
+        // ⏭️ Saat video selesai, lanjut ke MainActivity
+        videoView.setOnCompletionListener(mp -> {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();
-        }, SPLASH_DURATION);
+        });
+
+        // ⚠️ Jika video gagal diputar, langsung lanjut
+        videoView.setOnErrorListener((mp, what, extra) -> {
+            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            finish();
+            return true;
+        });
     }
 }
