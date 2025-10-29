@@ -1,13 +1,18 @@
 package com.example.tempatkita.ui;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -20,8 +25,14 @@ import com.example.tempatkita.adapter.WisataAdapter;
 import com.example.tempatkita.model.Wisata;
 import com.google.android.material.button.MaterialButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.widget.NestedScrollView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,17 +44,41 @@ public class MainActivity extends AppCompatActivity {
     private static final int PAGE_SIZE = 10;
     private int currentPage = 1;
 
+    private AutoCompleteTextView dropdownKota;
+    private List<String> daftarKota = new ArrayList<>();
+    private String kotaDipilih = "";
+    private String currentQuery = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FloatingActionButton fabGoTop = findViewById(R.id.fabGoTop);
+        NestedScrollView scrollView = findViewById(R.id.scrollViewMain);
+
+        scrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener)
+            (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                if (scrollY > 300) {
+                    if (fabGoTop.getVisibility() == View.GONE) {
+                        fabGoTop.show();
+                    }
+                } else {
+                    if (fabGoTop.getVisibility() == View.VISIBLE) {
+                        fabGoTop.hide();
+                    }
+                }
+            });
+
+        fabGoTop.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
+
         setupSearchView();
+        setupDropdownKota();
         setupRecyclerView();
         setupLoadMoreButton();
     }
 
-    /** 🔍 Setup SearchView di Light & Dark Mode */
+    /** Setup SearchView di Light & Dark Mode */
     private void setupSearchView() {
         SearchView searchView = findViewById(R.id.searchView);
         if (searchView == null) return;
@@ -52,21 +87,17 @@ public class MainActivity extends AppCompatActivity {
         searchView.clearFocus();
         searchView.setQueryHint("Mau berlibur ke mana?");
 
-        // Deteksi apakah sedang di Dark Mode
         boolean isDarkMode = (getResources().getConfiguration().uiMode &
                 Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
 
-        // Ambil warna dari resources
         int backgroundColor = ContextCompat.getColor(this, R.color.surface);
         int textColor = ContextCompat.getColor(this, R.color.text_primary);
         int hintColor = ContextCompat.getColor(this, R.color.text_secondary);
         int iconColor = ContextCompat.getColor(this, R.color.text_primary);
 
-        // Ubah background SearchView
         searchView.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
 
         try {
-            // Background input field (search plate)
             int plateId = searchView.getContext().getResources()
                     .getIdentifier("android:id/search_plate", null, null);
             View plate = searchView.findViewById(plateId);
@@ -74,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 plate.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
             }
 
-            // Text input
             int textId = searchView.getContext().getResources()
                     .getIdentifier("android:id/search_src_text", null, null);
             TextView textView = searchView.findViewById(textId);
@@ -85,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 textView.setTextSize(15);
             }
 
-            // Ikon search
             int iconId = searchView.getContext().getResources()
                     .getIdentifier("android:id/search_mag_icon", null, null);
             ImageView icon = searchView.findViewById(iconId);
@@ -93,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
                 icon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
             }
 
-            // Ikon close
             int closeId = searchView.getContext().getResources()
                     .getIdentifier("android:id/search_close_btn", null, null);
             ImageView closeIcon = searchView.findViewById(closeId);
@@ -104,19 +132,71 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Listener pencarian
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                filterList(query);
+                currentQuery = query != null ? query : "";
+                filterCombined();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterList(newText);
+                currentQuery = newText != null ? newText : "";
+                filterCombined();
                 return true;
             }
+        });
+    }
+
+    /** Setup Dropdown Kota/Kabupaten */
+    private void setupDropdownKota() {
+        dropdownKota = findViewById(R.id.dropdownKota);
+
+        // read regency.json from assets (if file missing, we fallback silently to empty list)
+        try {
+            InputStream is = getAssets().open("regency.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            String json = new String(buffer, StandardCharsets.UTF_8);
+
+            JSONArray jsonArray = new JSONArray(json);
+            daftarKota.clear();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                // Some JSONs use "regency" key, others "name" — keep to "regency" per your example
+                String namaKota = obj.optString("regency", obj.optString("name", ""));
+                if (!namaKota.isEmpty()) daftarKota.add(namaKota);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Gagal memuat daftar kota (periksa assets/regency.json)", Toast.LENGTH_SHORT).show();
+        }
+
+        // set adapter for AutoCompleteTextView
+        ArrayAdapter<String> adapterKota = new ArrayAdapter<>(
+                this, android.R.layout.simple_dropdown_item_1line, daftarKota);
+        dropdownKota.setAdapter(adapterKota);
+        dropdownKota.setThreshold(1);
+
+        // IMPORTANT: use parent.getItemAtPosition(position) — not daftarKota.get(position)
+        dropdownKota.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
+            Object item = parent.getItemAtPosition(position);
+            if (item == null) return;
+            String selected = item.toString();
+
+            // set text into dropdown without filtering again
+            dropdownKota.setText(selected, false);
+
+            // hide keyboard & clear focus
+            dropdownKota.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) imm.hideSoftInputFromWindow(dropdownKota.getWindowToken(), 0);
+
+            kotaDipilih = selected != null ? selected : "";
+            filterCombined();
         });
     }
 
@@ -130,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         int end = Math.min(PAGE_SIZE, wisataList.size());
         filteredList.addAll(wisataList.subList(0, end));
 
-        adapter = new WisataAdapter(filteredList);
+        adapter = new WisataAdapter(this,filteredList);
         recyclerView.setAdapter(adapter);
     }
 
@@ -140,20 +220,48 @@ public class MainActivity extends AppCompatActivity {
         btnLoadMore.setOnClickListener(v -> loadMore());
     }
 
-    /** Filter daftar wisata berdasarkan input */
-    private void filterList(String query) {
+    /** Gabungan filter: nama (currentQuery) + kota (kotaDipilih) */
+    private void filterCombined() {
         filteredList.clear();
-        if (query.isEmpty()) {
-            int end = Math.min(currentPage * PAGE_SIZE, wisataList.size());
-            filteredList.addAll(wisataList.subList(0, end));
-        } else {
-            for (Wisata w : wisataList) {
-                if (w.getNama().toLowerCase().contains(query.toLowerCase())) {
-                    filteredList.add(w);
-                }
+
+        // Normalize filter strings
+        String q = (currentQuery == null ? "" : currentQuery.trim().toLowerCase());
+        String k = (kotaDipilih == null ? "" : kotaDipilih.trim().toLowerCase());
+
+        // remove common words to make matching more tolerant
+        q = normalize(q);
+        k = normalize(k);
+
+        for (Wisata w : wisataList) {
+            String nama = normalize(w.getNama().toLowerCase());
+            String lokasi = normalize(w.getLokasi().toLowerCase());
+
+            boolean matchNama = q.isEmpty() || nama.contains(q);
+            boolean matchKota = k.isEmpty() || lokasi.contains(k) || k.contains(lokasi);
+
+            if (matchNama && matchKota) {
+                filteredList.add(w);
             }
         }
+
+        if (filteredList.isEmpty()) {
+            // show toast only if user actively searching or chose a city
+            if (!q.isEmpty() || !k.isEmpty())
+                Toast.makeText(this, "Tidak ada hasil yang cocok", Toast.LENGTH_SHORT).show();
+        }
+
         adapter.notifyDataSetChanged();
+    }
+
+    /** Make text simpler for matching */
+    private String normalize(String s) {
+        if (s == null) return "";
+        String result = s.replaceAll("(?i)kabupaten", "")
+                .replaceAll("(?i)kota", "")
+                .replaceAll("[,\\-]"," ")
+                .replaceAll("\\s+"," ")
+                .trim();
+        return result;
     }
 
     /** Pagination (load lebih banyak data) */

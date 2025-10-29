@@ -8,7 +8,9 @@
     android:background="@color/background"
     tools:context=".ui.MainActivity">
 
+    <!-- 🔹 ScrollView utama -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -16,9 +18,10 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_xlarge">
 
-            <!-- Hero Header -->
+            <!-- 🔹 Hero Header -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/hero_height">
@@ -48,8 +51,7 @@
                         android:textColor="@color/white"
                         android:textSize="@dimen/text_hero_title"
                         android:textStyle="bold"
-                        android:gravity="center"
-                        tools:ignore="HardcodedText" />
+                        android:gravity="center" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -58,17 +60,17 @@
                         android:textColor="@color/white"
                         android:textSize="@dimen/text_hero_subtitle"
                         android:gravity="center"
-                        android:layout_marginTop="@dimen/margin_small"/>
+                        android:layout_marginTop="@dimen/margin_small" />
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- Search Bar -->
+            <!-- 🔹 Search Bar -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_screen"
                 android:layout_marginTop="@dimen/search_overlap_margin"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="@dimen/margin_medium"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 android:backgroundTint="@color/surface"
                 app:cardElevation="@dimen/card_elevation">
@@ -83,7 +85,48 @@
                     android:padding="@dimen/padding_small" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- RecyclerView -->
+            <!-- 🔹 Dropdown Filter Kota -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_screen"
+                android:layout_marginTop="@dimen/margin_small"
+                android:layout_marginBottom="@dimen/margin_medium"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                android:backgroundTint="@color/surface"
+                app:cardElevation="@dimen/card_elevation">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/baseline_location_on_24"
+                        app:tint="@color/text_secondary"
+                        android:layout_marginEnd="8dp" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdownKota"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Cari kota atau kabupaten..."
+                        android:inputType="text"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
+                        android:textSize="15sp"
+                        android:background="@android:color/transparent"
+                        android:dropDownHeight="250dp"
+                        android:dropDownVerticalOffset="8dp"
+                        android:paddingVertical="6dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 🔹 RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewWisata"
                 android:layout_width="match_parent"
@@ -92,7 +135,7 @@
                 android:paddingHorizontal="@dimen/padding_screen"
                 tools:listitem="@layout/item_wisata" />
 
-            <!-- Tombol Load More -->
+            <!-- 🔹 Tombol Load More -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLoadMore"
                 android:layout_width="wrap_content"
@@ -109,7 +152,21 @@
                 app:icon="@drawable/expand_more_24"
                 app:iconTint="@color/white"
                 app:iconGravity="textStart"
-                app:iconPadding="@dimen/icon_padding"/>
+                app:iconPadding="@dimen/icon_padding" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- 🔹 Tombol Go to Top (dipindahkan ke luar scroll) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabGoTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:src="@drawable/ic_arrow_up_24"
+        android:contentDescription="Kembali ke atas"
+        android:visibility="gone"
+        app:tint="@color/white"
+        app:backgroundTint="@color/primary"
+        android:layout_gravity="bottom|end" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
