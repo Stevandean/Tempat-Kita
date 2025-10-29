@@ -1,0 +1,22 @@
+[
+  {
+    "nama": "Candi Borobudur",
+    "lokasi": "Magelang, Jawa Tengah",
+    "gambar": "hero"
+  },
+  {
+    "nama": "Candi Prambanan",
+    "lokasi": "Sleman, Yogyakarta",
+    "gambar": "ic_launcher_foreground"
+  },
+  {
+    "nama": "Gunung Bromo",
+    "lokasi": "Probolinggo, Jawa Timur",
+    "gambar": "ic_launcher_foreground"
+  },
+  {
+    "nama": "Danau Toba",
+    "lokasi": "Sumatera Utara",
+    "gambar": "ic_launcher_foreground"
+  }
+]

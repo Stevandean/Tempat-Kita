@@ -1,7 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:background="@color/surface"
     android:elevation="3dp"
@@ -15,13 +16,12 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher_round"
         app:shapeAppearanceOverlay="@style/RoundedImage"
-        app:strokeWidth="0dp"
         android:layout_marginEnd="12dp" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
@@ -42,4 +42,13 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
     </LinearLayout>
+
+    <!-- Tombol Love -->
+    <ImageView
+        android:id="@+id/iconLove"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_love_border"
+        android:contentDescription="Favorite"
+        android:layout_marginStart="8dp" />
 </LinearLayout>
