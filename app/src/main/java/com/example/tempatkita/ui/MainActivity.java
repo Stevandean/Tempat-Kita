@@ -5,6 +5,8 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -155,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupDropdownKota() {
         dropdownKota = findViewById(R.id.dropdownKota);
 
-        // read regency.json from assets (if file missing, we fallback silently to empty list)
+        // Load data dari regency.json
         try {
             InputStream is = getAssets().open("regency.json");
             int size = is.available();
@@ -168,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
             daftarKota.clear();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                // Some JSONs use "regency" key, others "name" — keep to "regency" per your example
                 String namaKota = obj.optString("regency", obj.optString("name", ""));
                 if (!namaKota.isEmpty()) daftarKota.add(namaKota);
             }
@@ -177,28 +178,47 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Gagal memuat daftar kota (periksa assets/regency.json)", Toast.LENGTH_SHORT).show();
         }
 
-        // set adapter for AutoCompleteTextView
         ArrayAdapter<String> adapterKota = new ArrayAdapter<>(
                 this, android.R.layout.simple_dropdown_item_1line, daftarKota);
         dropdownKota.setAdapter(adapterKota);
         dropdownKota.setThreshold(1);
 
-        // IMPORTANT: use parent.getItemAtPosition(position) — not daftarKota.get(position)
+        // Saat user memilih kota dari dropdown
         dropdownKota.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
             Object item = parent.getItemAtPosition(position);
             if (item == null) return;
             String selected = item.toString();
 
-            // set text into dropdown without filtering again
             dropdownKota.setText(selected, false);
 
-            // hide keyboard & clear focus
+            // Sembunyikan keyboard
             dropdownKota.clearFocus();
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) imm.hideSoftInputFromWindow(dropdownKota.getWindowToken(), 0);
 
+            // Simpan kota yang dipilih dan filter
             kotaDipilih = selected != null ? selected : "";
             filterCombined();
+        });
+
+        // Tambahkan listener untuk deteksi penghapusan teks manual
+        dropdownKota.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Jika teks kosong -> reset kotaDipilih dan tampilkan semua (atau filter hanya berdasarkan search)
+                if (s.toString().trim().isEmpty()) {
+                    if (!kotaDipilih.isEmpty()) {
+                        kotaDipilih = "";
+                        filterCombined();
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
     }
 
@@ -230,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
         String q = (currentQuery == null ? "" : currentQuery.trim().toLowerCase());
         String k = (kotaDipilih == null ? "" : kotaDipilih.trim().toLowerCase());
 
-        // remove common words to make matching more tolerant
         q = normalize(q);
         k = normalize(k);
 
@@ -241,19 +260,28 @@ public class MainActivity extends AppCompatActivity {
             boolean matchNama = q.isEmpty() || nama.contains(q);
             boolean matchKota = k.isEmpty() || lokasi.contains(k) || k.contains(lokasi);
 
+            // Filter tetap mempertimbangkan kota walau search dikosongkan
             if (matchNama && matchKota) {
                 filteredList.add(w);
             }
         }
 
+        // Kalau user hapus teks pencarian dan tidak pilih kota, tampilkan default 10 data
+        if (q.isEmpty() && k.isEmpty()) {
+            filteredList.clear();
+            int end = Math.min(PAGE_SIZE, wisataList.size());
+            filteredList.addAll(wisataList.subList(0, end));
+        }
+
         if (filteredList.isEmpty()) {
-            // show toast only if user actively searching or chose a city
-            if (!q.isEmpty() || !k.isEmpty())
+            if (!q.isEmpty() || !k.isEmpty()) {
                 Toast.makeText(this, "Tidak ada hasil yang cocok", Toast.LENGTH_SHORT).show();
+            }
         }
 
         adapter.notifyDataSetChanged();
     }
+
 
     /** Make text simpler for matching */
     private String normalize(String s) {

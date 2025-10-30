@@ -63,17 +63,31 @@ public class DetailActivity extends AppCompatActivity {
 
         // deskripsi panjang secara dinamis
         textDeskripsi.setText(
-                "Tempat wisata " + nama + " terletak di " + lokasi + ". " +
-                        "Destinasi ini dikenal sebagai salah satu lokasi wisata favorit yang menawarkan perpaduan keindahan alam, budaya, dan kenyamanan bagi para pengunjung.\n\n" +
-                        "Di " + nama + ", Anda dapat menikmati suasana yang menenangkan dengan pemandangan alam yang memukau. " +
-                        "Bagi para pencinta fotografi, tempat ini menawarkan banyak spot menarik yang Instagramable. " +
-                        "Selain itu, wisatawan juga dapat mencicipi kuliner khas daerah sekitar yang menggugah selera.\n\n" +
-                        "Fasilitas di kawasan ini cukup lengkap, mulai dari area parkir yang luas, pusat oleh-oleh, hingga area istirahat yang nyaman. " +
-                        "Beberapa kegiatan populer yang bisa dilakukan di sini antara lain berjalan-jalan santai, bersepeda, piknik bersama keluarga, atau sekadar menikmati udara segar sambil bersantai.\n\n" +
-                        "Waktu terbaik untuk berkunjung adalah saat pagi atau sore hari, ketika cuaca terasa sejuk dan cahaya matahari menambah keindahan panorama. " +
-                        "Bagi yang ingin menginap, tersedia pula penginapan dengan berbagai pilihan harga dan fasilitas.\n\n" +
-                        "Dengan segala daya tarik dan keunikannya, " + nama + " menjadi destinasi yang wajib dikunjungi saat Anda berada di kawasan " + lokasi +
-                        ". Nikmati pengalaman tak terlupakan dan abadikan setiap momennya di tempat wisata luar biasa ini!"
+                "Tempat wisata " + nama + " berlokasi di " + lokasi + ", sebuah kawasan yang terkenal dengan pesona alamnya yang menawan serta atmosfer yang menenangkan. " +
+                "Destinasi ini menjadi salah satu pilihan favorit bagi wisatawan yang ingin melepas penat dari rutinitas, sekaligus menikmati keindahan alam, budaya lokal, dan suasana khas daerah yang ramah dan bersahabat.\n\n" +
+
+                "Di " + nama + ", pengunjung akan disambut dengan panorama alam yang memukau—mulai dari hamparan hijau pepohonan, udara yang sejuk, hingga suara alam yang menenangkan. " +
+                "Tempat ini sangat cocok untuk Anda yang menyukai ketenangan atau ingin mencari inspirasi di tengah suasana alami yang asri. " +
+                "Bagi pencinta fotografi, tersedia banyak spot menarik yang sangat Instagramable, mulai dari sudut pemandangan alam terbuka hingga area dengan dekorasi unik yang menjadi ciri khas destinasi ini.\n\n" +
+
+                "Selain pesona alamnya, " + nama + " juga menjadi daya tarik wisata kuliner. Di sekitar lokasi, Anda bisa mencicipi beragam makanan khas daerah yang menggugah selera, ditemani dengan suasana hangat masyarakat lokal. " +
+                "Tak jarang pula, terdapat pertunjukan seni dan budaya yang menambah nilai pengalaman berwisata di sini.\n\n" +
+
+                "Fasilitas di kawasan ini sudah cukup lengkap untuk menunjang kenyamanan pengunjung. Tersedia area parkir luas, pusat informasi wisata, toilet bersih, area bermain anak, serta tempat istirahat yang nyaman. " +
+                "Beberapa pengelola juga menyediakan penyewaan sepeda, gazebo untuk bersantai, serta toko suvenir yang menjual produk lokal sebagai oleh-oleh. " +
+                "Semua ini menjadikan pengalaman berkunjung semakin menyenangkan dan berkesan.\n\n" +
+
+                "Beragam aktivitas bisa dilakukan di " + nama + ", mulai dari berjalan santai di sekitar area, berfoto ria di spot pemandangan terbaik, menikmati piknik keluarga, hingga mengikuti kegiatan outbound yang seru. " +
+                "Bagi penggemar petualangan, beberapa jalur trekking dan area eksplorasi alam juga tersedia untuk dieksplor.\n\n" +
+
+                "Waktu terbaik untuk berkunjung biasanya pada pagi hari saat udara masih segar dan kabut tipis menyelimuti area, atau sore hari ketika cahaya matahari mulai redup dan menciptakan suasana yang hangat serta romantis. " +
+                "Bagi wisatawan yang ingin menghabiskan waktu lebih lama, tersedia penginapan mulai dari homestay sederhana hingga resort modern dengan fasilitas lengkap dan pemandangan indah langsung ke alam sekitar.\n\n" +
+
+                "Dengan perpaduan keindahan alam, fasilitas yang memadai, dan keramahan masyarakat sekitar, " + nama + " benar-benar menawarkan pengalaman wisata yang menyenangkan dan tak terlupakan. " +
+                "Destinasi ini sangat direkomendasikan bagi siapa pun yang ingin beristirahat sejenak dari kesibukan kota dan mencari ketenangan di tengah nuansa alam yang menenangkan.\n\n" +
+
+                "Jadi, saat Anda berkunjung ke kawasan " + lokasi + ", jangan lewatkan kesempatan untuk menikmati pesona " + nama + ". " +
+                "Rasakan setiap momennya, abadikan keindahannya, dan bawa pulang kenangan berharga dari tempat wisata luar biasa ini!"
         );
 
         // 🔙 Tombol kembali ke halaman utama
