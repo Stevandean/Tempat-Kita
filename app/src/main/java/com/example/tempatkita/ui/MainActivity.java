@@ -1,6 +1,7 @@
 package com.example.tempatkita.ui;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
@@ -34,7 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.widget.NestedScrollView;
 
@@ -52,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
     private List<String> daftarKota = new ArrayList<>();
     private String kotaDipilih = "";
     private String currentQuery = "";
+
+    // tambahkan ini bersama field lain
+    private android.content.SharedPreferences prefs;
+    private List<Wisata> lovedList = new ArrayList<>();
+    private List<Wisata> normalList = new ArrayList<>();
+    private int normalOffset = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,13 +239,49 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
+        // Ambil semua data dari sumber JSON
+        wisataList.clear();
         wisataList.addAll(getWisataList());
-        int end = Math.min(PAGE_SIZE, wisataList.size());
-        filteredList.addAll(wisataList.subList(0, end));
 
-        adapter = new WisataAdapter(this,filteredList);
+        // Ambil daftar like dari SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("favorites", MODE_PRIVATE);
+        Set<String> lovedNames = prefs.getStringSet("saved_wisata", new HashSet<>());
+
+        // Filter agar destinasi yang di-love selalu muncul di awal
+        List<Wisata> lovedList = new ArrayList<>();
+        List<Wisata> normalList = new ArrayList<>();
+
+        for (Wisata w : wisataList) {
+            if (lovedNames.contains(w.getNama())) {
+                w.setLoved(true);
+                lovedList.add(w);
+            } else {
+                w.setLoved(false);
+                normalList.add(w);
+            }
+        }
+
+        // Gabungkan: loved di atas, sisanya di bawah (tapi tetap batasi PAGE_SIZE awal)
+        List<Wisata> initialList = new ArrayList<>();
+        initialList.addAll(lovedList);
+
+        int remaining = PAGE_SIZE - lovedList.size();
+        if (remaining > 0) {
+            initialList.addAll(normalList.subList(0, Math.min(remaining, normalList.size())));
+        }
+
+        filteredList.clear();
+        filteredList.addAll(initialList);
+
+        adapter = new WisataAdapter(this, filteredList);
         recyclerView.setAdapter(adapter);
+
+        // Simpan untuk pagination
+        this.lovedList = lovedList;
+        this.normalList = normalList;
+        currentPage = 1;
     }
+
 
     /** Tombol Load More */
     private void setupLoadMoreButton() {
@@ -282,7 +329,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-
     /** Make text simpler for matching */
     private String normalize(String s) {
         if (s == null) return "";
@@ -297,11 +343,13 @@ public class MainActivity extends AppCompatActivity {
     /** Pagination (load lebih banyak data) */
     private void loadMore() {
         int start = currentPage * PAGE_SIZE;
-        int end = Math.min(start + PAGE_SIZE, wisataList.size());
+        int end = Math.min(start + PAGE_SIZE, normalList.size());
+
         if (start < end) {
-            filteredList.addAll(wisataList.subList(start, end));
-            adapter.notifyItemRangeInserted(start, end - start);
+            List<Wisata> newList = normalList.subList(start, end);
+            adapter.syncWithSavedPreferences(newList);
             currentPage++;
+            Toast.makeText(this, "Menampilkan data tambahan", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Semua data sudah ditampilkan", Toast.LENGTH_SHORT).show();
         }
@@ -350,4 +398,3 @@ public class MainActivity extends AppCompatActivity {
         return list;
     }
 }
-

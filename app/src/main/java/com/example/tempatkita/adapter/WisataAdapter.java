@@ -22,6 +22,8 @@ import com.example.tempatkita.ui.DetailActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +40,37 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
         this.wisataList = wisataList;
         this.prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE);
         this.savedItems = new HashSet<>(prefs.getStringSet("saved_wisata", new HashSet<>()));
+
+        // pastikan setiap data tahu status "loved" dan posisi asli
+        for (int i = 0; i < wisataList.size(); i++) {
+            Wisata w = wisataList.get(i);
+            w.setOriginalIndex(i);
+            w.setLoved(savedItems.contains(w.getNama()));
+        }
+
+        sortList();
+    }
+
+    // dipanggil ketika load more
+    public void syncWithSavedPreferences(List<Wisata> newList) {
+        for (int i = 0; i < newList.size(); i++) {
+            Wisata w = newList.get(i);
+            w.setOriginalIndex(wisataList.size() + i);
+            w.setLoved(savedItems.contains(w.getNama()));
+        }
+        wisataList.addAll(newList);
+        sortList();
+        notifyDataSetChanged();
+    }
+
+    public void refreshFromPrefs() {
+        savedItems.clear();
+        savedItems.addAll(prefs.getStringSet("saved_wisata", new HashSet<>()));
+        for (Wisata w : wisataList) {
+            w.setLoved(savedItems.contains(w.getNama()));
+        }
+        sortList();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -54,8 +87,6 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
         holder.textNama.setText(wisata.getNama());
         holder.textLokasi.setText(wisata.getLokasi());
 
-        System.out.println("DEBUG_IMG: mencoba load " + wisata.getGambar());
-        // 🔹 load gambar dari assets
         try {
             InputStream is = context.getAssets().open(wisata.getGambar());
             Bitmap bitmap = BitmapFactory.decodeStream(is);
@@ -63,12 +94,12 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             is.close();
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("DEBUG_IMG: gagal load " + wisata.getGambar());
-            holder.imageView.setImageResource(R.drawable.ic_launcher_foreground); // fallback
+            holder.imageView.setImageResource(R.drawable.ic_launcher_foreground);
         }
 
-        boolean isSaved = savedItems.contains(wisata.getNama());
-        holder.iconLove.setImageResource(isSaved ? R.drawable.ic_love_filled : R.drawable.ic_love_border);
+        holder.iconLove.setImageResource(
+                wisata.isLoved() ? R.drawable.ic_love_filled : R.drawable.ic_love_border
+        );
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DetailActivity.class);
@@ -78,25 +109,45 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             v.getContext().startActivity(intent);
         });
 
-        holder.iconLove.setOnClickListener(v -> {
-            boolean currentlySaved = savedItems.contains(wisata.getNama());
+        holder.iconLove.setOnClickListener(v -> toggleLike(holder, wisata));
+    }
 
-            ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.iconLove, "scaleX", 1f, 1.3f, 1f);
-            ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.iconLove, "scaleY", 1f, 1.3f, 1f);
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(scaleX, scaleY);
-            animatorSet.setDuration(500);
-            animatorSet.start();
+    private void toggleLike(ViewHolder holder, Wisata wisata) {
+        boolean currentlyLiked = wisata.isLoved();
 
-            if (currentlySaved) {
-                savedItems.remove(wisata.getNama());
-                holder.iconLove.setImageResource(R.drawable.ic_love_border);
-            } else {
-                savedItems.add(wisata.getNama());
-                holder.iconLove.setImageResource(R.drawable.ic_love_filled);
+        // animasi love
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.iconLove, "scaleX", 1f, 1.3f, 1f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.iconLove, "scaleY", 1f, 1.3f, 1f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(scaleX, scaleY);
+        animatorSet.setDuration(300);
+        animatorSet.start();
+
+        wisata.setLoved(!currentlyLiked);
+        if (currentlyLiked) {
+            savedItems.remove(wisata.getNama());
+        } else {
+            savedItems.add(wisata.getNama());
+        }
+
+        prefs.edit().putStringSet("saved_wisata", new HashSet<>(savedItems)).apply();
+
+        int oldPosition = wisataList.indexOf(wisata);
+        sortList();
+        int newPosition = wisataList.indexOf(wisata);
+
+        notifyItemMoved(oldPosition, newPosition);
+        notifyItemChanged(newPosition);
+    }
+
+    private void sortList() {
+        Collections.sort(wisataList, new Comparator<Wisata>() {
+            @Override
+            public int compare(Wisata o1, Wisata o2) {
+                if (o1.isLoved() && !o2.isLoved()) return -1;
+                if (!o1.isLoved() && o2.isLoved()) return 1;
+                return Integer.compare(o1.getOriginalIndex(), o2.getOriginalIndex());
             }
-
-            prefs.edit().putStringSet("saved_wisata", new HashSet<>(savedItems)).apply();
         });
     }
 
@@ -117,5 +168,4 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             iconLove = itemView.findViewById(R.id.iconLove);
         }
     }
-
 }
