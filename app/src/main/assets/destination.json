@@ -1,22 +1,504 @@
 [
-  {
-    "nama": "Candi Borobudur",
-    "lokasi": "Magelang, Jawa Tengah",
-    "gambar": "hero"
-  },
-  {
-    "nama": "Candi Prambanan",
-    "lokasi": "Sleman, Yogyakarta",
-    "gambar": "ic_launcher_foreground"
-  },
-  {
-    "nama": "Gunung Bromo",
-    "lokasi": "Probolinggo, Jawa Timur",
-    "gambar": "ic_launcher_foreground"
-  },
-  {
-    "nama": "Danau Toba",
-    "lokasi": "Sumatera Utara",
-    "gambar": "ic_launcher_foreground"
-  }
+  [
+    {
+      "nama": "Candi Borobudur",
+      "lokasi": "Magelang, Jawa Tengah",
+      "gambar": "Candi_Borobudur"
+    },
+    {
+      "nama": "Candi Prambanan",
+      "lokasi": "Sleman, Yogyakarta",
+      "gambar": "Candi_Prambanan"
+    },
+    {
+      "nama": "Gunung Bromo",
+      "lokasi": "Probolinggo, Jawa Timur",
+      "gambar": "Gunung_Bromo"
+    },
+    {
+      "nama": "Danau Toba",
+      "lokasi": "Sumatera Utara",
+      "gambar": "Danau_Toba"
+    },
+    {
+      "nama": "Raja Ampat",
+      "lokasi": "Papua Barat",
+      "gambar": "Raja_Ampat"
+    },
+    {
+      "nama": "Labuan Bajo",
+      "lokasi": "Nusa Tenggara Timur",
+      "gambar": "Labuan_Bajo"
+    },
+    {
+      "nama": "Pulau Komodo",
+      "lokasi": "Nusa Tenggara Timur",
+      "gambar": "Pulau_Komodo"
+    },
+    {
+      "nama": "Kawah Ijen",
+      "lokasi": "Banyuwangi, Jawa Timur",
+      "gambar": "Kawah_Ijen"
+    },
+    {
+      "nama": "Pantai Kuta",
+      "lokasi": "Bali",
+      "gambar": "Pantai_Kuta"
+    },
+    {
+      "nama": "Ubud",
+      "lokasi": "Bali",
+      "gambar": "Ubud"
+    },
+    {
+      "nama": "Nusa Penida",
+      "lokasi": "Bali",
+      "gambar": "Nusa_Penida"
+    },
+    {
+      "nama": "Gili Trawangan",
+      "lokasi": "Lombok, NTB",
+      "gambar": "Gili_Trawangan"
+    },
+    {
+      "nama": "Gunung Rinjani",
+      "lokasi": "Lombok, NTB",
+      "gambar": "Gunung_Rinjani"
+    },
+    {
+      "nama": "Pulau Derawan",
+      "lokasi": "Kalimantan Timur",
+      "gambar": "Pulau_Derawan"
+    },
+    {
+      "nama": "Bunaken",
+      "lokasi": "Manado, Sulawesi Utara",
+      "gambar": "Bunaken"
+    },
+    {
+      "nama": "Wakatobi",
+      "lokasi": "Sulawesi Tenggara",
+      "gambar": "Wakatobi"
+    },
+    {
+      "nama": "Taman Nasional Baluran",
+      "lokasi": "Situbondo, Jawa Timur",
+      "gambar": "Taman_Nasional_Baluran"
+    },
+    {
+      "nama": "Pulau Weh",
+      "lokasi": "Sabang, Aceh",
+      "gambar": "Pulau_Weh"
+    },
+    {
+      "nama": "Pantai Parangtritis",
+      "lokasi": "Yogyakarta",
+      "gambar": "Pantai_Parangtritis"
+    },
+    {
+      "nama": "Karimunjawa",
+      "lokasi": "Jepara, Jawa Tengah",
+      "gambar": "Karimunjawa"
+    },
+    {
+      "nama": "Kepulauan Seribu",
+      "lokasi": "DKI Jakarta",
+      "gambar": "Kepulauan_Seribu"
+    },
+    {
+      "nama": "Taman Mini Indonesia Indah",
+      "lokasi": "Jakarta Timur",
+      "gambar": "Taman_Mini_Indonesia_Indah"
+    },
+    {
+      "nama": "Monas",
+      "lokasi": "Jakarta Pusat",
+      "gambar": "Monas"
+    },
+    {
+      "nama": "Dieng Plateau",
+      "lokasi": "Wonosobo, Jawa Tengah",
+      "gambar": "Dieng_Plateau"
+    },
+    {
+      "nama": "Pantai Pangandaran",
+      "lokasi": "Jawa Barat",
+      "gambar": "Pantai_Pangandaran"
+    },
+    {
+      "nama": "Green Canyon",
+      "lokasi": "Pangandaran, Jawa Barat",
+      "gambar": "Green_Canyon"
+    },
+    {
+      "nama": "Gunung Tangkuban Perahu",
+      "lokasi": "Bandung, Jawa Barat",
+      "gambar": "Gunung_Tangkuban_Perahu"
+    },
+    {
+      "nama": "Kawah Putih",
+      "lokasi": "Ciwidey, Bandung",
+      "gambar": "Kawah_Putih"
+    },
+    {
+      "nama": "Situ Patenggang",
+      "lokasi": "Bandung Selatan",
+      "gambar": "Situ_Patenggang"
+    },
+    {
+      "nama": "Lembang",
+      "lokasi": "Bandung Barat",
+      "gambar": "Lembang"
+    },
+    {
+      "nama": "Tangkahan",
+      "lokasi": "Langkat, Sumatera Utara",
+      "gambar": "Tangkahan"
+    },
+    {
+      "nama": "Gunung Kerinci",
+      "lokasi": "Jambi",
+      "gambar": "Gunung_Kerinci"
+    },
+    {
+      "nama": "Pulau Belitung",
+      "lokasi": "Kepulauan Bangka Belitung",
+      "gambar": "Pulau_Belitung"
+    },
+    {
+      "nama": "Pantai Tanjung Tinggi",
+      "lokasi": "Belitung",
+      "gambar": "Pantai_Tanjung_Tinggi"
+    },
+    {
+      "nama": "Pulau Lengkuas",
+      "lokasi": "Belitung",
+      "gambar": "Pulau_Lengkuas"
+    },
+    {
+      "nama": "Mentawai",
+      "lokasi": "Sumatera Barat",
+      "gambar": "Mentawai"
+    },
+    {
+      "nama": "Jam Gadang",
+      "lokasi": "Bukittinggi, Sumatera Barat",
+      "gambar": "Jam_Gadang"
+    },
+    {
+      "nama": "Danau Maninjau",
+      "lokasi": "Sumatera Barat",
+      "gambar": "Danau_Maninjau"
+    },
+    {
+      "nama": "Taman Nasional Way Kambas",
+      "lokasi": "Lampung",
+      "gambar": "Taman_Nasional_Way_Kambas"
+    },
+    {
+      "nama": "Pulau Sebesi",
+      "lokasi": "Lampung Selatan",
+      "gambar": "Pulau_Sebesi"
+    },
+    {
+      "nama": "Gunung Krakatau",
+      "lokasi": "Selat Sunda",
+      "gambar": "Gunung_Krakatau"
+    },
+    {
+      "nama": "Taman Nasional Ujung Kulon",
+      "lokasi": "Banten",
+      "gambar": "Taman_Nasional_Ujung_Kulon"
+    },
+    {
+      "nama": "Pantai Sawarna",
+      "lokasi": "Lebak, Banten",
+      "gambar": "Pantai_Sawarna"
+    },
+    {
+      "nama": "Pulau Peucang",
+      "lokasi": "Pandeglang, Banten",
+      "gambar": "Pulau_Peucang"
+    },
+    {
+      "nama": "Ciletuh Geopark",
+      "lokasi": "Sukabumi, Jawa Barat",
+      "gambar": "Ciletuh_Geopark"
+    },
+    {
+      "nama": "Gunung Semeru",
+      "lokasi": "Lumajang, Jawa Timur",
+      "gambar": "Gunung_Semeru"
+    },
+    {
+      "nama": "Gunung Merapi",
+      "lokasi": "Yogyakarta",
+      "gambar": "Gunung_Merapi"
+    },
+    {
+      "nama": "Pantai Menganti",
+      "lokasi": "Kebumen, Jawa Tengah",
+      "gambar": "Pantai_Menganti"
+    },
+    {
+      "nama": "Pantai Teluk Asmara",
+      "lokasi": "Malang, Jawa Timur",
+      "gambar": "Pantai_Teluk_Asmara"
+    },
+    {
+      "nama": "Pantai Goa Cina",
+      "lokasi": "Malang, Jawa Timur",
+      "gambar": "Pantai_Goa_Cina"
+    },
+    {
+      "nama": "Pantai Tiga Warna",
+      "lokasi": "Malang, Jawa Timur",
+      "gambar": "Pantai_Tiga_Warna"
+    },
+    {
+      "nama": "Pantai Papuma",
+      "lokasi": "Jember, Jawa Timur",
+      "gambar": "Pantai_Papuma"
+    },
+    {
+      "nama": "Air Terjun Tumpak Sewu",
+      "lokasi": "Lumajang, Jawa Timur",
+      "gambar": "Air_Terjun_Tumpak_Sewu"
+    },
+    {
+      "nama": "Gunung Lawu",
+      "lokasi": "Karanganyar, Jawa Tengah",
+      "gambar": "Gunung_Lawu"
+    },
+    {
+      "nama": "Pantai Balekambang",
+      "lokasi": "Malang, Jawa Timur",
+      "gambar": "Pantai_Balekambang"
+    },
+    {
+      "nama": "Malioboro",
+      "lokasi": "Yogyakarta",
+      "gambar": "Malioboro"
+    },
+    {
+      "nama": "Keraton Yogyakarta",
+      "lokasi": "Yogyakarta",
+      "gambar": "Keraton_Yogyakarta"
+    },
+    {
+      "nama": "Alun-Alun Kidul",
+      "lokasi": "Yogyakarta",
+      "gambar": "Alun_Alun_Kidul"
+    },
+    {
+      "nama": "Goa Pindul",
+      "lokasi": "Gunung Kidul, Yogyakarta",
+      "gambar": "Goa_Pindul"
+    },
+    {
+      "nama": "Pantai Indrayanti",
+      "lokasi": "Gunung Kidul, Yogyakarta",
+      "gambar": "Pantai_Indrayanti"
+    },
+    {
+      "nama": "Pantai Drini",
+      "lokasi": "Gunung Kidul, Yogyakarta",
+      "gambar": "Pantai_Drini"
+    },
+    {
+      "nama": "Pantai Pok Tunggal",
+      "lokasi": "Gunung Kidul, Yogyakarta",
+      "gambar": "Pantai_Pok_Tunggal"
+    },
+    {
+      "nama": "Museum Angkut",
+      "lokasi": "Batu, Jawa Timur",
+      "gambar": "Museum_Angkut"
+    },
+    {
+      "nama": "Jatim Park 2",
+      "lokasi": "Batu, Jawa Timur",
+      "gambar": "Jatim_Park_2"
+    },
+    {
+      "nama": "Selecta",
+      "lokasi": "Batu, Jawa Timur",
+      "gambar": "Selecta"
+    },
+    {
+      "nama": "Alun-Alun Batu",
+      "lokasi": "Batu, Jawa Timur",
+      "gambar": "Alun_Alun_Batu"
+    },
+    {
+      "nama": "Pantai Losari",
+      "lokasi": "Makassar, Sulawesi Selatan",
+      "gambar": "Pantai_Losari"
+    },
+    {
+      "nama": "Tana Toraja",
+      "lokasi": "Sulawesi Selatan",
+      "gambar": "Tana_Toraja"
+    },
+    {
+      "nama": "Danau Tempe",
+      "lokasi": "Sulawesi Selatan",
+      "gambar": "Danau_Tempe"
+    },
+    {
+      "nama": "Pantai Bira",
+      "lokasi": "Bulukumba, Sulawesi Selatan",
+      "gambar": "Pantai_Bira"
+    },
+    {
+      "nama": "Danau Sentani",
+      "lokasi": "Jayapura, Papua",
+      "gambar": "Danau_Sentani"
+    },
+    {
+      "nama": "Pegunungan Arfak",
+      "lokasi": "Manokwari, Papua Barat",
+      "gambar": "Pegunungan_Arfak"
+    },
+    {
+      "nama": "Pantai Ora",
+      "lokasi": "Maluku Tengah",
+      "gambar": "Pantai_Ora"
+    },
+    {
+      "nama": "Pulau Kei",
+      "lokasi": "Maluku Tenggara",
+      "gambar": "Pulau_Kei"
+    },
+    {
+      "nama": "Pantai Liang",
+      "lokasi": "Ambon, Maluku",
+      "gambar": "Pantai_Liang"
+    },
+    {
+      "nama": "Danau Kelimutu",
+      "lokasi": "Ende, Flores",
+      "gambar": "Danau_Kelimutu"
+    },
+    {
+      "nama": "Pulau Alor",
+      "lokasi": "Nusa Tenggara Timur",
+      "gambar": "Pulau_Alor"
+    },
+    {
+      "nama": "Pulau Sumba",
+      "lokasi": "Nusa Tenggara Timur",
+      "gambar": "Pulau_Sumba"
+    },
+    {
+      "nama": "Pantai Nihiwatu",
+      "lokasi": "Sumba, NTT",
+      "gambar": "Pantai_Nihiwatu"
+    },
+    {
+      "nama": "Air Terjun Moramo",
+      "lokasi": "Konawe Selatan, Sulawesi Tenggara",
+      "gambar": "Air_Terjun_Moramo"
+    },
+    {
+      "nama": "Pantai Pink",
+      "lokasi": "Lombok Timur, NTB",
+      "gambar": "Pantai_Pink"
+    },
+    {
+      "nama": "Bukit Merese",
+      "lokasi": "Lombok Tengah, NTB",
+      "gambar": "Bukit_Merese"
+    },
+    {
+      "nama": "Gili Meno",
+      "lokasi": "Lombok, NTB",
+      "gambar": "Gili_Meno"
+    },
+    {
+      "nama": "Gili Air",
+      "lokasi": "Lombok, NTB",
+      "gambar": "Gili_Air"
+    },
+    {
+      "nama": "Pantai Senggigi",
+      "lokasi": "Lombok Barat, NTB",
+      "gambar": "ic_launcher_foreground"
+    },
+    {
+      "nama": "Pantai Batu Bolong",
+      "lokasi": "Lombok, NTB",
+      "gambar": "Pantai_Batu_Bolong"
+    },
+    {
+      "nama": "Pulau Togean",
+      "lokasi": "Sulawesi Tengah",
+      "gambar": "Pulau_Togean"
+    },
+    {
+      "nama": "Lembah Harau",
+      "lokasi": "Lima Puluh Kota, Sumatera Barat",
+      "gambar": "Lembah_Harau"
+    },
+    {
+      "nama": "Gunung Batur",
+      "lokasi": "Kintamani, Bali",
+      "gambar": "Gunung_Batur"
+    },
+    {
+      "nama": "Pantai Lovina",
+      "lokasi": "Buleleng, Bali",
+      "gambar": "Pantai_Lovina"
+    },
+    {
+      "nama": "Bedugul",
+      "lokasi": "Tabanan, Bali",
+      "gambar": "Bedugul"
+    },
+    {
+      "nama": "Pura Tanah Lot",
+      "lokasi": "Tabanan, Bali",
+      "gambar": "Pura_Tanah_Lot"
+    },
+    {
+      "nama": "Pura Besakih",
+      "lokasi": "Karangasem, Bali",
+      "gambar": "Pura_Besakih"
+    },
+    {
+      "nama": "Pantai Pandawa",
+      "lokasi": "Badung, Bali",
+      "gambar": "Pantai_Pandawa"
+    },
+    {
+      "nama": "Pantai Dreamland",
+      "lokasi": "Badung, Bali",
+      "gambar": "Pantai_Dreamland"
+    },
+    {
+      "nama": "Pantai Sanur",
+      "lokasi": "Denpasar, Bali",
+      "gambar": "Pantai_Sanur"
+    },
+    {
+      "nama": "Pantai Jimbaran",
+      "lokasi": "Bali",
+      "gambar": "Pantai_Jimbaran"
+    },
+    {
+      "nama": "Pantai Melasti",
+      "lokasi": "Ungasan, Bali",
+      "gambar": "Pantai_Melasti"
+    },
+    {
+      "nama": "Bukit Campuhan",
+      "lokasi": "Ubud, Bali",
+      "gambar": "Bukit_Campuhan"
+    },
+    {
+      "nama": "Tegallalang Rice Terrace",
+      "lokasi": "Ubud, Bali",
+      "gambar": "Tegallalang_Rice_Terrace"
+    }
+  ]
 ]

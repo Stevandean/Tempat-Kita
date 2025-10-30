@@ -27,6 +27,8 @@ import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -58,17 +60,17 @@ public class MainActivity extends AppCompatActivity {
         NestedScrollView scrollView = findViewById(R.id.scrollViewMain);
 
         scrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener)
-            (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                if (scrollY > 300) {
-                    if (fabGoTop.getVisibility() == View.GONE) {
-                        fabGoTop.show();
+                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                    if (scrollY > 300) {
+                        if (fabGoTop.getVisibility() == View.GONE) {
+                            fabGoTop.show();
+                        }
+                    } else {
+                        if (fabGoTop.getVisibility() == View.VISIBLE) {
+                            fabGoTop.hide();
+                        }
                     }
-                } else {
-                    if (fabGoTop.getVisibility() == View.VISIBLE) {
-                        fabGoTop.hide();
-                    }
-                }
-            });
+                });
 
         fabGoTop.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
 
@@ -277,29 +279,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** Data wisata dummy */
+    /** Data wisata dari JSON */
     private List<Wisata> getWisataList() {
         List<Wisata> list = new ArrayList<>();
-        list.add(new Wisata("Candi Borobudur", "Magelang, Jawa Tengah", R.drawable.hero));
-        list.add(new Wisata("Candi Prambanan", "Sleman, Yogyakarta", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Bromo", "Probolinggo, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Danau Toba", "Sumatera Utara", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Komodo", "Nusa Tenggara Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Raja Ampat", "Papua Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Kawah Ijen", "Banyuwangi, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Kuta", "Bali", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Parangtritis", "Yogyakarta", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Derawan", "Kalimantan Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Tana Toraja", "Sulawesi Selatan", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Weh", "Aceh", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Labuan Bajo", "Flores, NTT", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Bukit Tinggi", "Sumatera Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Belitung", "Kepulauan Bangka Belitung", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Samosir", "Sumatera Utara", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Taman Nasional Baluran", "Banyuwangi, Jawa Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pantai Pink", "Lombok Timur", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Pulau Menjangan", "Bali Barat", R.drawable.ic_launcher_foreground));
-        list.add(new Wisata("Gunung Rinjani", "Lombok, NTB", R.drawable.ic_launcher_foreground));
+        try {
+            InputStream is = getAssets().open("destination.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+            String json = new String(buffer, StandardCharsets.UTF_8);
+            JSONArray jsonArray = new JSONArray(json);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                String nama = obj.optString("nama");
+                String lokasi = obj.optString("lokasi");
+                String gambar = obj.optString("gambar");
+
+                // Jika JSON cuma berisi nama gambar tanpa ekstensi
+                String[] possibleExt = {".png", ".jpg", ".jpeg"};
+                String foundPath = null;
+
+                for (String ext : possibleExt) {
+                    try (InputStream test = getAssets().open("img/" + gambar + ext)) {
+                        foundPath = "img/" + gambar + ext;
+                        break;
+                    } catch (IOException ignored) {}
+                }
+
+                if (foundPath == null) {
+                    foundPath = "img/default.png"; // fallback
+                }
+
+                list.add(new Wisata(nama, lokasi, foundPath));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Gagal memuat data wisata (destination.json)", Toast.LENGTH_SHORT).show();
+        }
         return list;
     }
 }
+

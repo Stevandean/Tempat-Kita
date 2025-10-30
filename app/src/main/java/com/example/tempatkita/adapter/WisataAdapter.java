@@ -5,6 +5,8 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,8 @@ import com.example.tempatkita.R;
 import com.example.tempatkita.model.Wisata;
 import com.example.tempatkita.ui.DetailActivity;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,8 +31,10 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
     private final List<Wisata> wisataList;
     private final SharedPreferences prefs;
     private final Set<String> savedItems;
+    private final Context context;
 
     public WisataAdapter(Context context, List<Wisata> wisataList) {
+        this.context = context;
         this.wisataList = wisataList;
         this.prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE);
         this.savedItems = new HashSet<>(prefs.getStringSet("saved_wisata", new HashSet<>()));
@@ -47,12 +53,23 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
         Wisata wisata = wisataList.get(position);
         holder.textNama.setText(wisata.getNama());
         holder.textLokasi.setText(wisata.getLokasi());
-        holder.imageView.setImageResource(wisata.getGambar());
+
+        System.out.println("DEBUG_IMG: mencoba load " + wisata.getGambar());
+        // 🔹 load gambar dari assets
+        try {
+            InputStream is = context.getAssets().open(wisata.getGambar());
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            holder.imageView.setImageBitmap(bitmap);
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("DEBUG_IMG: gagal load " + wisata.getGambar());
+            holder.imageView.setImageResource(R.drawable.ic_launcher_foreground); // fallback
+        }
 
         boolean isSaved = savedItems.contains(wisata.getNama());
         holder.iconLove.setImageResource(isSaved ? R.drawable.ic_love_filled : R.drawable.ic_love_border);
 
-        // Klik item → buka detail
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DetailActivity.class);
             intent.putExtra("nama", wisata.getNama());
@@ -61,11 +78,9 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             v.getContext().startActivity(intent);
         });
 
-        // Klik love → animasi + toggle simpan/hapus
         holder.iconLove.setOnClickListener(v -> {
             boolean currentlySaved = savedItems.contains(wisata.getNama());
 
-            // Animasi pop (scale in & out)
             ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.iconLove, "scaleX", 1f, 1.3f, 1f);
             ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.iconLove, "scaleY", 1f, 1.3f, 1f);
             AnimatorSet animatorSet = new AnimatorSet();
@@ -73,7 +88,6 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             animatorSet.setDuration(500);
             animatorSet.start();
 
-            // Ganti icon setelah animasi mulai
             if (currentlySaved) {
                 savedItems.remove(wisata.getNama());
                 holder.iconLove.setImageResource(R.drawable.ic_love_border);
@@ -103,4 +117,5 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             iconLove = itemView.findViewById(R.id.iconLove);
         }
     }
+
 }
