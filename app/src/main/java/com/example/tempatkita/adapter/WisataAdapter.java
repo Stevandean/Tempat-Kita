@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,11 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tempatkita.R;
 import com.example.tempatkita.model.Wisata;
 import com.example.tempatkita.ui.DetailActivity;
+import com.example.tempatkita.ui.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,45 +40,21 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
         this.wisataList = wisataList;
         this.prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE);
         this.savedItems = new HashSet<>(prefs.getStringSet("saved_wisata", new HashSet<>()));
-
-        // pastikan setiap data tahu status "loved" dan posisi asli
-        for (int i = 0; i < wisataList.size(); i++) {
-            Wisata w = wisataList.get(i);
-            w.setOriginalIndex(i);
-            w.setLoved(savedItems.contains(w.getNama()));
-        }
-
-        sortList();
     }
 
-    // dipanggil ketika load more
     public void syncWithSavedPreferences(List<Wisata> newList) {
-        for (int i = 0; i < newList.size(); i++) {
-            Wisata w = newList.get(i);
-            w.setOriginalIndex(wisataList.size() + i);
+        for (Wisata w : newList) {
             w.setLoved(savedItems.contains(w.getNama()));
         }
         wisataList.addAll(newList);
-        sortList();
-        notifyDataSetChanged();
-    }
-
-    public void refreshFromPrefs() {
-        savedItems.clear();
-        savedItems.addAll(prefs.getStringSet("saved_wisata", new HashSet<>()));
-        for (Wisata w : wisataList) {
-            w.setLoved(savedItems.contains(w.getNama()));
-        }
-        sortList();
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_wisata, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_wisata, parent, false));
     }
 
     @Override
@@ -93,7 +69,6 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
             holder.imageView.setImageBitmap(bitmap);
             is.close();
         } catch (IOException e) {
-            e.printStackTrace();
             holder.imageView.setImageResource(R.drawable.ic_launcher_foreground);
         }
 
@@ -102,11 +77,11 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
         );
 
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), DetailActivity.class);
+            Intent intent = new Intent(context, DetailActivity.class);
             intent.putExtra("nama", wisata.getNama());
             intent.putExtra("lokasi", wisata.getLokasi());
             intent.putExtra("gambar", wisata.getGambar());
-            v.getContext().startActivity(intent);
+            context.startActivity(intent);
         });
 
         holder.iconLove.setOnClickListener(v -> toggleLike(holder, wisata));
@@ -115,40 +90,35 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
     private void toggleLike(ViewHolder holder, Wisata wisata) {
         boolean currentlyLiked = wisata.isLoved();
 
-        // animasi love
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.iconLove, "scaleX", 1f, 1.3f, 1f);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.iconLove, "scaleY", 1f, 1.3f, 1f);
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(scaleX, scaleY);
-        animatorSet.setDuration(300);
-        animatorSet.start();
+        ObjectAnimator sx = ObjectAnimator.ofFloat(holder.iconLove, "scaleX", 1f, 1.3f, 1f);
+        ObjectAnimator sy = ObjectAnimator.ofFloat(holder.iconLove, "scaleY", 1f, 1.3f, 1f);
+        AnimatorSet as = new AnimatorSet();
+        as.playTogether(sx, sy);
+        as.setDuration(300);
+        as.start();
 
         wisata.setLoved(!currentlyLiked);
-        if (currentlyLiked) {
-            savedItems.remove(wisata.getNama());
-        } else {
-            savedItems.add(wisata.getNama());
-        }
+        if (currentlyLiked) savedItems.remove(wisata.getNama());
+        else savedItems.add(wisata.getNama());
 
         prefs.edit().putStringSet("saved_wisata", new HashSet<>(savedItems)).apply();
 
-        int oldPosition = wisataList.indexOf(wisata);
-        sortList();
-        int newPosition = wisataList.indexOf(wisata);
+        Toast.makeText(context,
+                wisata.getNama() + (wisata.isLoved() ? " Ditambahkan ke favorit" : " Dihapus dari favorit"),
+                Toast.LENGTH_SHORT).show();
 
-        notifyItemMoved(oldPosition, newPosition);
-        notifyItemChanged(newPosition);
-    }
+        // Sync dengan MainActivity list
+        if (context instanceof MainActivity) {
+            MainActivity main = (MainActivity) context;
+            main.updateFavorite(wisata, wisata.isLoved());
 
-    private void sortList() {
-        Collections.sort(wisataList, new Comparator<Wisata>() {
-            @Override
-            public int compare(Wisata o1, Wisata o2) {
-                if (o1.isLoved() && !o2.isLoved()) return -1;
-                if (!o1.isLoved() && o2.isLoved()) return 1;
-                return Integer.compare(o1.getOriginalIndex(), o2.getOriginalIndex());
+            if (!main.isFiltering) {
+                main.sortListsAndReload();
+                return;
             }
-        });
+        }
+
+        notifyItemChanged(holder.getAdapterPosition());
     }
 
     @Override
@@ -160,12 +130,12 @@ public class WisataAdapter extends RecyclerView.Adapter<WisataAdapter.ViewHolder
         ImageView imageView, iconLove;
         TextView textNama, textLokasi;
 
-        ViewHolder(View itemView) {
-            super(itemView);
-            imageView = itemView.findViewById(R.id.imageWisata);
-            textNama = itemView.findViewById(R.id.textNamaWisata);
-            textLokasi = itemView.findViewById(R.id.textLokasiWisata);
-            iconLove = itemView.findViewById(R.id.iconLove);
+        ViewHolder(View item) {
+            super(item);
+            imageView = item.findViewById(R.id.imageWisata);
+            textNama = item.findViewById(R.id.textNamaWisata);
+            textLokasi = item.findViewById(R.id.textLokasiWisata);
+            iconLove = item.findViewById(R.id.iconLove);
         }
     }
 }

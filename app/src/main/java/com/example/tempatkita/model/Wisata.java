@@ -3,9 +3,9 @@ package com.example.tempatkita.model;
 public class Wisata {
     private String nama;
     private String lokasi;
-    private String gambar; // ubah dari int ke String
+    private String gambar;
     private boolean loved;
-    private int likeCount; // like untuk list destination keatas
+    private int likeCount;
     private int originalIndex;
 
     public Wisata(String nama, String lokasi, String gambar) {

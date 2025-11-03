@@ -8,7 +8,7 @@
     android:background="@color/background"
     tools:context=".ui.MainActivity">
 
-    <!-- 🔹 ScrollView utama -->
+    <!-- ScrollView utama -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollViewMain"
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/margin_xlarge">
 
-            <!-- 🔹 Hero Header -->
+            <!-- Hero Header -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/hero_height">
@@ -64,7 +64,7 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- 🔹 Search Bar -->
+            <!-- Search Bar -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
                     android:padding="@dimen/padding_small" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 🔹 Dropdown Filter Kota -->
+            <!-- Dropdown Filter Kota -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 🔹 RecyclerView -->
+            <!-- RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewWisata"
                 android:layout_width="match_parent"
@@ -135,7 +135,7 @@
                 android:paddingHorizontal="@dimen/padding_screen"
                 tools:listitem="@layout/item_wisata" />
 
-            <!-- 🔹 Tombol Load More -->
+            <!-- Tombol Load More -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLoadMore"
                 android:layout_width="wrap_content"
@@ -156,7 +156,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- 🔹 Tombol Go to Top (dipindahkan ke luar scroll) -->
+    <!-- Tombol Go to Top (dipindahkan ke luar scroll) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabGoTop"
         android:layout_width="wrap_content"

@@ -57,12 +57,10 @@ public class MainActivity extends AppCompatActivity {
     private String kotaDipilih = "";
     private String currentQuery = "";
 
-    // tambahkan ini bersama field lain
-    private android.content.SharedPreferences prefs;
-    private List<Wisata> lovedList = new ArrayList<>();
-    private List<Wisata> normalList = new ArrayList<>();
-    private int normalOffset = 0;
-
+    private SharedPreferences prefs;
+    public List<Wisata> lovedList = new ArrayList<>();
+    public List<Wisata> normalList = new ArrayList<>();
+    public boolean isFiltering = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,313 +86,232 @@ public class MainActivity extends AppCompatActivity {
         fabGoTop.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
 
         setupSearchView();
-        setupDropdownKota();
+//        setupDropdownKota();
         setupRecyclerView();
         setupLoadMoreButton();
     }
 
-    /** Setup SearchView di Light & Dark Mode */
     private void setupSearchView() {
         SearchView searchView = findViewById(R.id.searchView);
-        if (searchView == null) return;
-
         searchView.setIconifiedByDefault(false);
         searchView.clearFocus();
         searchView.setQueryHint("Mau berlibur ke mana?");
 
-        boolean isDarkMode = (getResources().getConfiguration().uiMode &
-                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-
-        int backgroundColor = ContextCompat.getColor(this, R.color.surface);
         int textColor = ContextCompat.getColor(this, R.color.text_primary);
         int hintColor = ContextCompat.getColor(this, R.color.text_secondary);
         int iconColor = ContextCompat.getColor(this, R.color.text_primary);
-
-        searchView.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
+        int bg = ContextCompat.getColor(this, R.color.surface);
 
         try {
             int plateId = searchView.getContext().getResources()
                     .getIdentifier("android:id/search_plate", null, null);
             View plate = searchView.findViewById(plateId);
-            if (plate != null) {
-                plate.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
-            }
+            if (plate != null) plate.setBackgroundTintList(ColorStateList.valueOf(bg));
 
             int textId = searchView.getContext().getResources()
                     .getIdentifier("android:id/search_src_text", null, null);
             TextView textView = searchView.findViewById(textId);
-            if (textView != null) {
-                textView.setTextColor(textColor);
-                textView.setHintTextColor(hintColor);
-                textView.setHint("Mau berlibur ke mana?");
-                textView.setTextSize(15);
-            }
+            textView.setTextColor(textColor);
+            textView.setHintTextColor(hintColor);
+            textView.setHint("Mau berlibur ke mana?");
+            textView.setTextSize(15);
 
-            int iconId = searchView.getContext().getResources()
-                    .getIdentifier("android:id/search_mag_icon", null, null);
-            ImageView icon = searchView.findViewById(iconId);
-            if (icon != null) {
-                icon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
-            }
+            ImageView icon = searchView.findViewById(searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_mag_icon", null, null));
+            icon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
 
-            int closeId = searchView.getContext().getResources()
-                    .getIdentifier("android:id/search_close_btn", null, null);
-            ImageView closeIcon = searchView.findViewById(closeId);
-            if (closeIcon != null) {
-                closeIcon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                currentQuery = query != null ? query : "";
+            @Override public boolean onQueryTextSubmit(String q) {
+                currentQuery = q;
                 filterCombined();
                 return true;
             }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                currentQuery = newText != null ? newText : "";
+            @Override public boolean onQueryTextChange(String q) {
+                currentQuery = q;
                 filterCombined();
                 return true;
             }
         });
     }
 
-    /** Setup Dropdown Kota/Kabupaten */
     private void setupDropdownKota() {
         dropdownKota = findViewById(R.id.dropdownKota);
 
-        // Load data dari regency.json
         try {
             InputStream is = getAssets().open("regency.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            String json = new String(buffer, StandardCharsets.UTF_8);
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer); is.close();
+            JSONArray arr = new JSONArray(new String(buffer, StandardCharsets.UTF_8));
 
-            JSONArray jsonArray = new JSONArray(json);
             daftarKota.clear();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                String namaKota = obj.optString("regency", obj.optString("name", ""));
-                if (!namaKota.isEmpty()) daftarKota.add(namaKota);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                daftarKota.add(obj.optString("regency", obj.optString("name", "")));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Gagal memuat daftar kota (periksa assets/regency.json)", Toast.LENGTH_SHORT).show();
-        }
+        } catch (Exception ignored) {}
 
-        ArrayAdapter<String> adapterKota = new ArrayAdapter<>(
-                this, android.R.layout.simple_dropdown_item_1line, daftarKota);
+        ArrayAdapter<String> adapterKota = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, daftarKota);
+
         dropdownKota.setAdapter(adapterKota);
         dropdownKota.setThreshold(1);
 
-        // Saat user memilih kota dari dropdown
-        dropdownKota.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
-            Object item = parent.getItemAtPosition(position);
-            if (item == null) return;
-            String selected = item.toString();
-
-            dropdownKota.setText(selected, false);
-
-            // Sembunyikan keyboard
+        dropdownKota.setOnItemClickListener((parent, view, position, id) -> {
+            kotaDipilih = parent.getItemAtPosition(position).toString();
             dropdownKota.clearFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null) imm.hideSoftInputFromWindow(dropdownKota.getWindowToken(), 0);
-
-            // Simpan kota yang dipilih dan filter
-            kotaDipilih = selected != null ? selected : "";
+            hideKeyboard();
             filterCombined();
         });
 
-        // Tambahkan listener untuk deteksi penghapusan teks manual
         dropdownKota.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Jika teks kosong -> reset kotaDipilih dan tampilkan semua (atau filter hanya berdasarkan search)
+            @Override public void beforeTextChanged(CharSequence s,int a,int b,int c){}
+            @Override public void onTextChanged(CharSequence s,int a,int b,int c){
                 if (s.toString().trim().isEmpty()) {
-                    if (!kotaDipilih.isEmpty()) {
-                        kotaDipilih = "";
-                        filterCombined();
-                    }
+                    kotaDipilih = "";
+                    filterCombined();
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s){}
         });
     }
 
-    /** Setup RecyclerView dan tampilkan data */
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(dropdownKota.getWindowToken(), 0);
+    }
+
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.recyclerViewWisata);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
 
-        // Ambil semua data dari sumber JSON
         wisataList.clear();
         wisataList.addAll(getWisataList());
 
-        // Ambil daftar like dari SharedPreferences
         SharedPreferences prefs = getSharedPreferences("favorites", MODE_PRIVATE);
         Set<String> lovedNames = prefs.getStringSet("saved_wisata", new HashSet<>());
 
-        // Filter agar destinasi yang di-love selalu muncul di awal
-        List<Wisata> lovedList = new ArrayList<>();
-        List<Wisata> normalList = new ArrayList<>();
+        lovedList.clear();
+        normalList.clear();
 
         for (Wisata w : wisataList) {
             if (lovedNames.contains(w.getNama())) {
                 w.setLoved(true);
                 lovedList.add(w);
             } else {
-                w.setLoved(false);
                 normalList.add(w);
             }
         }
 
-        // Gabungkan: loved di atas, sisanya di bawah (tapi tetap batasi PAGE_SIZE awal)
-        List<Wisata> initialList = new ArrayList<>();
-        initialList.addAll(lovedList);
-
-        int remaining = PAGE_SIZE - lovedList.size();
-        if (remaining > 0) {
-            initialList.addAll(normalList.subList(0, Math.min(remaining, normalList.size())));
-        }
-
         filteredList.clear();
-        filteredList.addAll(initialList);
+        filteredList.addAll(lovedList);
+        int rem = PAGE_SIZE - lovedList.size();
+        if (rem > 0) filteredList.addAll(normalList.subList(0, Math.min(rem, normalList.size())));
 
         adapter = new WisataAdapter(this, filteredList);
         recyclerView.setAdapter(adapter);
-
-        // Simpan untuk pagination
-        this.lovedList = lovedList;
-        this.normalList = normalList;
-        currentPage = 1;
     }
 
-
-    /** Tombol Load More */
     private void setupLoadMoreButton() {
         MaterialButton btnLoadMore = findViewById(R.id.btnLoadMore);
         btnLoadMore.setOnClickListener(v -> loadMore());
     }
 
-    /** Gabungan filter: nama (currentQuery) + kota (kotaDipilih) */
+    /** ✅ Dipanggil Adapter tiap love toggle */
+    public void updateFavorite(Wisata w, boolean loved) {
+        if (loved) {
+            normalList.remove(w);
+            if (!lovedList.contains(w)) lovedList.add(w);
+        } else {
+            lovedList.remove(w);
+            if (!normalList.contains(w)) normalList.add(w);
+        }
+    }
+
+    /** ✅ Untuk refresh list jika tidak sedang filter */
+    public void sortListsAndReload() {
+        List<Wisata> merged = new ArrayList<>(lovedList);
+        merged.addAll(normalList);
+
+        filteredList.clear();
+        filteredList.addAll(merged);
+
+        adapter.notifyDataSetChanged();
+    }
+
     private void filterCombined() {
+        isFiltering = true;
+
         filteredList.clear();
 
-        // Normalize filter strings
-        String q = (currentQuery == null ? "" : currentQuery.trim().toLowerCase());
-        String k = (kotaDipilih == null ? "" : kotaDipilih.trim().toLowerCase());
-
-        q = normalize(q);
-        k = normalize(k);
+        String q = normalize(currentQuery.toLowerCase());
+        String k = normalize(kotaDipilih.toLowerCase());
 
         for (Wisata w : wisataList) {
             String nama = normalize(w.getNama().toLowerCase());
             String lokasi = normalize(w.getLokasi().toLowerCase());
 
             boolean matchNama = q.isEmpty() || nama.contains(q);
-            boolean matchKota = k.isEmpty() || lokasi.contains(k) || k.contains(lokasi);
+            boolean matchKota = k.isEmpty() || lokasi.contains(k);
 
-            // Filter tetap mempertimbangkan kota walau search dikosongkan
-            if (matchNama && matchKota) {
-                filteredList.add(w);
-            }
+            if (matchNama && matchKota) filteredList.add(w);
         }
 
-        // Kalau user hapus teks pencarian dan tidak pilih kota, tampilkan default 10 data
         if (q.isEmpty() && k.isEmpty()) {
             filteredList.clear();
-            int end = Math.min(PAGE_SIZE, wisataList.size());
-            filteredList.addAll(wisataList.subList(0, end));
-        }
-
-        if (filteredList.isEmpty()) {
-            if (!q.isEmpty() || !k.isEmpty()) {
-                Toast.makeText(this, "Tidak ada hasil yang cocok", Toast.LENGTH_SHORT).show();
-            }
+            filteredList.addAll(lovedList);
+            filteredList.addAll(normalList.subList(0, Math.min(PAGE_SIZE, normalList.size())));
         }
 
         adapter.notifyDataSetChanged();
     }
 
-    /** Make text simpler for matching */
     private String normalize(String s) {
-        if (s == null) return "";
-        String result = s.replaceAll("(?i)kabupaten", "")
+        return s.replaceAll("(?i)kabupaten", "")
                 .replaceAll("(?i)kota", "")
                 .replaceAll("[,\\-]"," ")
-                .replaceAll("\\s+"," ")
                 .trim();
-        return result;
     }
 
-    /** Pagination (load lebih banyak data) */
     private void loadMore() {
-        int start = currentPage * PAGE_SIZE;
+        int start = lovedList.size() + (currentPage * PAGE_SIZE);
         int end = Math.min(start + PAGE_SIZE, normalList.size());
-
         if (start < end) {
             List<Wisata> newList = normalList.subList(start, end);
             adapter.syncWithSavedPreferences(newList);
             currentPage++;
-            Toast.makeText(this, "Menampilkan data tambahan", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Semua data sudah ditampilkan", Toast.LENGTH_SHORT).show();
         }
     }
 
-    /** Data wisata dari JSON */
     private List<Wisata> getWisataList() {
         List<Wisata> list = new ArrayList<>();
         try {
             InputStream is = getAssets().open("destination.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer); is.close();
+            JSONArray arr = new JSONArray(new String(buffer, StandardCharsets.UTF_8));
 
-            String json = new String(buffer, StandardCharsets.UTF_8);
-            JSONArray jsonArray = new JSONArray(json);
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
                 String nama = obj.optString("nama");
                 String lokasi = obj.optString("lokasi");
                 String gambar = obj.optString("gambar");
 
-                // Jika JSON cuma berisi nama gambar tanpa ekstensi
-                String[] possibleExt = {".png", ".jpg", ".jpeg"};
-                String foundPath = null;
-
-                for (String ext : possibleExt) {
-                    try (InputStream test = getAssets().open("img/" + gambar + ext)) {
-                        foundPath = "img/" + gambar + ext;
-                        break;
-                    } catch (IOException ignored) {}
+                String[] ext = {".png",".jpg",".jpeg"};
+                String path = null;
+                for (String e : ext) {
+                    try (InputStream t = getAssets().open("img/"+gambar+e)) {
+                        path = "img/"+gambar+e; break;
+                    } catch (IOException ignored){}
                 }
+                if (path == null) path = "img/default.png";
 
-                if (foundPath == null) {
-                    foundPath = "img/default.png"; // fallback
-                }
-
-                list.add(new Wisata(nama, lokasi, foundPath));
+                list.add(new Wisata(nama,lokasi,path));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Gagal memuat data wisata (destination.json)", Toast.LENGTH_SHORT).show();
-        }
+        } catch (Exception ignored) {}
         return list;
     }
 }

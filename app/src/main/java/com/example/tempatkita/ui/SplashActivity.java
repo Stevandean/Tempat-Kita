@@ -19,7 +19,7 @@ public class SplashActivity extends AppCompatActivity {
 
         VideoView videoView = findViewById(R.id.videoSplash);
 
-        // 🔍 Deteksi mode tampilan (dark atau light)
+        // Deteksi mode tampilan (dark atau light)
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
         int videoResId;
@@ -35,17 +35,17 @@ public class SplashActivity extends AppCompatActivity {
         Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + videoResId);
         videoView.setVideoURI(videoUri);
 
-        // ▶️ Putar video
+        // Putar video
         videoView.start();
 
-        // ⏭️ Saat video selesai, lanjut ke MainActivity
+        // Saat video selesai, lanjut ke MainActivity
         videoView.setOnCompletionListener(mp -> {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();
         });
 
-        // ⚠️ Jika video gagal diputar, langsung lanjut
+        // Jika video gagal diputar, langsung lanjut
         videoView.setOnErrorListener((mp, what, extra) -> {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             finish();

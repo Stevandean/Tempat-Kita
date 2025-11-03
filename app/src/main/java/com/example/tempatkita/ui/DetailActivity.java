@@ -41,7 +41,7 @@ public class DetailActivity extends AppCompatActivity {
         textNama.setText(nama);
         textLokasi.setText(lokasi);
 
-        // 🔹 Load gambar dari assets/img/
+        // Load gambar dari assets/img/
         if (gambarNama != null && !gambarNama.isEmpty()) {
             try {
                 // Bersihkan path agar tidak ada slash ganda
@@ -90,20 +90,20 @@ public class DetailActivity extends AppCompatActivity {
                 "Rasakan setiap momennya, abadikan keindahannya, dan bawa pulang kenangan berharga dari tempat wisata luar biasa ini!"
         );
 
-        // 🔙 Tombol kembali ke halaman utama
+        // Tombol kembali ke halaman utama
         btnBack.setOnClickListener(v -> {
             finish(); // Kembali ke halaman sebelumnya (MainActivity)
             Toast.makeText(this, "Kembali ke daftar wisata", Toast.LENGTH_SHORT).show();
         });
 
-        // 📍 Tombol lihat peta (buka Google Maps)
+        // Tombol lihat peta (buka Google Maps)
         btnLihatPeta.setOnClickListener(v -> {
             String url = "https://www.google.com/maps/search/" + nama.replace(" ", "+");
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         });
 
-        // 🔔 Notifikasi saat halaman detail dibuka
+        // Notifikasi saat halaman detail dibuka
         Toast.makeText(this, "Menampilkan detail: " + nama, Toast.LENGTH_SHORT).show();
     }
 }
