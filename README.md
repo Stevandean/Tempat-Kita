@@ -1,7 +1,3 @@
-Now let me replace it with the professional README:
-Action: file_editor str_replace /app/README.md --old-str "# Here are your Instructions
-" --new-str "# TempatKita 🗺️
-
 <div align=\"center\">
   
   ![Beta](https://img.shields.io/badge/status-beta-yellow)
