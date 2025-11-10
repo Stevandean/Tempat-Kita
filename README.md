@@ -83,9 +83,9 @@ We're actively testing and refining the app. Your feedback is valuable!
 
 This project is developed and maintained by:
 
-- **[Pennnn](https://github.com/pennnn)** - Lead Developer
-- **[Alan](https://github.com/alan)** - Developer
-- **[Nando](https://github.com/nando)** - Developer
+- **[Pennnn](https://github.com/Stevandean)** - Lead Developer
+- **[Alan](https://github.com/Penaklukpetir)** - Developer
+- **[Nando](https://github.com/PutraGledek)** - Developer
 
 ---
 
