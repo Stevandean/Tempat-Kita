@@ -3,7 +3,6 @@ package com.example.tempatkita.ui;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,18 +14,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tempatkita.R;
 import com.example.tempatkita.adapter.WisataAdapter;
 import com.example.tempatkita.model.Wisata;
+import com.example.tempatkita.api.FirebaseInit;
+import com.example.tempatkita.api.TempatWisataService;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.cloud.firestore.Firestore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,9 +41,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.widget.NestedScrollView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,28 +67,81 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // ✅ Inisialisasi Firebase
+        FirebaseInit.initialize(this);
+        Firestore db = FirebaseInit.getFirestore();
+
         FloatingActionButton fabGoTop = findViewById(R.id.fabGoTop);
         NestedScrollView scrollView = findViewById(R.id.scrollViewMain);
 
         scrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener)
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                    if (scrollY > 300) {
-                        if (fabGoTop.getVisibility() == View.GONE) {
-                            fabGoTop.show();
-                        }
-                    } else {
-                        if (fabGoTop.getVisibility() == View.VISIBLE) {
-                            fabGoTop.hide();
-                        }
-                    }
+                    if (scrollY > 300) fabGoTop.show();
+                    else fabGoTop.hide();
                 });
 
         fabGoTop.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
 
         setupSearchView();
-//        setupDropdownKota();
         setupRecyclerView();
         setupLoadMoreButton();
+
+        // 🔥 Ambil data Firestore (jika ada)
+        loadTempatWisataFromFirestore(db);
+    }
+
+    /** ✅ Ambil data Firestore */
+    private void loadTempatWisataFromFirestore(Firestore db) {
+        TempatWisataService.getAllTempatWisata(db, new TempatWisataService.OnTempatWisataLoadedListener() {
+            @Override
+            public void onLoaded(List<Wisata> list) {
+                if (list != null && !list.isEmpty()) {
+                    wisataList.clear();
+                    wisataList.addAll(list);
+                    setupAdapter();
+                    Toast.makeText(MainActivity.this, "Data dimuat dari Firestore", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Fallback ke data lokal
+                    wisataList.clear();
+                    wisataList.addAll(getWisataList());
+                    setupAdapter();
+                    Toast.makeText(MainActivity.this, "Data lokal dimuat", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                wisataList.clear();
+                wisataList.addAll(getWisataList());
+                setupAdapter();
+                Toast.makeText(MainActivity.this, "Gagal memuat dari Firestore, gunakan data lokal", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupAdapter() {
+        SharedPreferences prefs = getSharedPreferences("favorites", MODE_PRIVATE);
+        Set<String> lovedNames = prefs.getStringSet("saved_wisata", new HashSet<>());
+
+        lovedList.clear();
+        normalList.clear();
+
+        for (Wisata w : wisataList) {
+            if (lovedNames.contains(w.getNama())) {
+                w.setLoved(true);
+                lovedList.add(w);
+            } else {
+                normalList.add(w);
+            }
+        }
+
+        filteredList.clear();
+        filteredList.addAll(lovedList);
+        int rem = PAGE_SIZE - lovedList.size();
+        if (rem > 0) filteredList.addAll(normalList.subList(0, Math.min(rem, normalList.size())));
+
+        adapter = new WisataAdapter(this, filteredList);
+        recyclerView.setAdapter(adapter);
     }
 
     private void setupSearchView() {
@@ -136,81 +189,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupDropdownKota() {
-        dropdownKota = findViewById(R.id.dropdownKota);
-
-        try {
-            InputStream is = getAssets().open("regency.json");
-            byte[] buffer = new byte[is.available()];
-            is.read(buffer); is.close();
-            JSONArray arr = new JSONArray(new String(buffer, StandardCharsets.UTF_8));
-
-            daftarKota.clear();
-            for (int i = 0; i < arr.length(); i++) {
-                JSONObject obj = arr.getJSONObject(i);
-                daftarKota.add(obj.optString("regency", obj.optString("name", "")));
-            }
-        } catch (Exception ignored) {}
-
-        ArrayAdapter<String> adapterKota = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, daftarKota);
-
-        dropdownKota.setAdapter(adapterKota);
-        dropdownKota.setThreshold(1);
-
-        dropdownKota.setOnItemClickListener((parent, view, position, id) -> {
-            kotaDipilih = parent.getItemAtPosition(position).toString();
-            dropdownKota.clearFocus();
-            hideKeyboard();
-            filterCombined();
-        });
-
-        dropdownKota.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s,int a,int b,int c){}
-            @Override public void onTextChanged(CharSequence s,int a,int b,int c){
-                if (s.toString().trim().isEmpty()) {
-                    kotaDipilih = "";
-                    filterCombined();
-                }
-            }
-            @Override public void afterTextChanged(Editable s){}
-        });
-    }
-
-    private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(dropdownKota.getWindowToken(), 0);
-    }
-
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.recyclerViewWisata);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        wisataList.clear();
-        wisataList.addAll(getWisataList());
-
-        SharedPreferences prefs = getSharedPreferences("favorites", MODE_PRIVATE);
-        Set<String> lovedNames = prefs.getStringSet("saved_wisata", new HashSet<>());
-
-        lovedList.clear();
-        normalList.clear();
-
-        for (Wisata w : wisataList) {
-            if (lovedNames.contains(w.getNama())) {
-                w.setLoved(true);
-                lovedList.add(w);
-            } else {
-                normalList.add(w);
-            }
-        }
-
-        filteredList.clear();
-        filteredList.addAll(lovedList);
-        int rem = PAGE_SIZE - lovedList.size();
-        if (rem > 0) filteredList.addAll(normalList.subList(0, Math.min(rem, normalList.size())));
-
-        adapter = new WisataAdapter(this, filteredList);
-        recyclerView.setAdapter(adapter);
     }
 
     private void setupLoadMoreButton() {
@@ -218,33 +199,10 @@ public class MainActivity extends AppCompatActivity {
         btnLoadMore.setOnClickListener(v -> loadMore());
     }
 
-    /** ✅ Dipanggil Adapter tiap love toggle */
-    public void updateFavorite(Wisata w, boolean loved) {
-        if (loved) {
-            normalList.remove(w);
-            if (!lovedList.contains(w)) lovedList.add(w);
-        } else {
-            lovedList.remove(w);
-            if (!normalList.contains(w)) normalList.add(w);
-        }
-    }
-
-    /** ✅ Untuk refresh list jika tidak sedang filter */
-    public void sortListsAndReload() {
-        List<Wisata> merged = new ArrayList<>(lovedList);
-        merged.addAll(normalList);
-
-        filteredList.clear();
-        filteredList.addAll(merged);
-
-        adapter.notifyDataSetChanged();
-    }
-
     private void filterCombined() {
         isFiltering = true;
 
         filteredList.clear();
-
         String q = normalize(currentQuery.toLowerCase());
         String k = normalize(kotaDipilih.toLowerCase());
 
@@ -299,17 +257,15 @@ public class MainActivity extends AppCompatActivity {
                 String nama = obj.optString("nama");
                 String lokasi = obj.optString("lokasi");
                 String gambar = obj.optString("gambar");
-
-                String[] ext = {".png",".jpg",".jpeg"};
+                String[] ext = {".png", ".jpg", ".jpeg"};
                 String path = null;
                 for (String e : ext) {
-                    try (InputStream t = getAssets().open("img/"+gambar+e)) {
-                        path = "img/"+gambar+e; break;
-                    } catch (IOException ignored){}
+                    try (InputStream t = getAssets().open("img/" + gambar + e)) {
+                        path = "img/" + gambar + e; break;
+                    } catch (IOException ignored) {}
                 }
                 if (path == null) path = "img/default.png";
-
-                list.add(new Wisata(nama,lokasi,path));
+                list.add(new Wisata(nama, lokasi, path));
             }
         } catch (Exception ignored) {}
         return list;
