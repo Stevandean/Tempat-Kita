@@ -85,7 +85,7 @@ This project is developed and maintained by:
 
 - **[Pennnn](https://github.com/Stevandean)** - Lead Developer
 - **[Alan](https://github.com/Penaklukpetir)** - Developer
-- **[Nando](https://github.com/PutraGledek)** - Developer
+- **[Nando](https://github.com/PutraGledek)** - Bot
 
 ---
 
