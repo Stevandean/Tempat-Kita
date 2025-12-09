@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tempatkita.R;
 import com.example.tempatkita.adapter.WisataAdapter;
+import com.example.tempatkita.di.FirebaseModule;
 import com.example.tempatkita.model.Wisata;
 import com.google.android.material.button.MaterialButton;
 
@@ -35,11 +37,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import androidx.core.widget.NestedScrollView;
 
 public class MainActivity extends AppCompatActivity {
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        testFirestoreConnection();
 
         FloatingActionButton fabGoTop = findViewById(R.id.fabGoTop);
         NestedScrollView scrollView = findViewById(R.id.scrollViewMain);
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         fabGoTop.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
 
         setupSearchView();
-//        setupDropdownKota();
+        setupDropdownKota();
         setupRecyclerView();
         setupLoadMoreButton();
     }
@@ -313,5 +320,25 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception ignored) {}
         return list;
+    }
+
+    // 🔥 TEST FIREBASE CONNECTION
+    private void testFirestoreConnection() {
+        FirebaseFirestore db = FirebaseModule.provideFirestore();
+
+        Map<String, Object> testData = new HashMap<>();
+        testData.put("status", "firebase_connected");
+        testData.put("timestamp", System.currentTimeMillis());
+
+        db.collection("test_connection")
+                .add(testData)
+                .addOnSuccessListener(doc -> {
+                    Toast.makeText(this, "Firebase Connected ✔", Toast.LENGTH_LONG).show();
+                    System.out.println("Document Added with ID: " + doc.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Firebase Failed ❌", Toast.LENGTH_LONG).show();
+                    System.out.println("Error: " + e.getMessage());
+                });
     }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591966238270",
+    "project_id": "tempat-kita-ee4aa",
+    "storage_bucket": "tempat-kita-ee4aa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591966238270:android:a77853c8cbbb28af5cc36f",
+        "android_client_info": {
+          "package_name": "com.example.tempatkita"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvndeOyWOdz5IVFyYe29RPnimKb2oTiUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
