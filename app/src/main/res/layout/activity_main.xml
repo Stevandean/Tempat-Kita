@@ -169,4 +169,13 @@
         app:backgroundTint="@color/primary"
         android:layout_gravity="bottom|end" />
 
+    <include
+        android:id="@+id/bottomMenu"
+        layout="@layout/component_bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/surface"
+        android:elevation="8dp"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -68,6 +68,10 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
 
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+
 //    Firebase BOM (mengatur versi otomatis untuk semua Firebase lib)
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
 

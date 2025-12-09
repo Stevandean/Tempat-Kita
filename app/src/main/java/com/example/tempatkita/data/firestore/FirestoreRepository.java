@@ -1,4 +1,4 @@
-package com.example.tempatkita.data.repository;
+package com.example.tempatkita.data.firestore;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.tempatkita.di.FirebaseModule;
