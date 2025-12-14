@@ -6,10 +6,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tempatkita.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -27,12 +29,12 @@ public class LoginActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
         btnLogin = findViewById(R.id.btnLogin);
         txtGotoRegister = findViewById(R.id.txtGotoRegister);
+
         auth = FirebaseAuth.getInstance();
 
         btnLogin.setOnClickListener(v -> loginUser());
         txtGotoRegister.setOnClickListener(v ->
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class))
-        );
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
     }
 
     private void loginUser() {
@@ -45,13 +47,30 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         auth.signInWithEmailAndPassword(email, pass)
-                .addOnSuccessListener(a -> {
-                    Toast.makeText(this, "Login Berhasil", Toast.LENGTH_SHORT).show();
+        .addOnSuccessListener(a -> {
+
+            String uid = auth.getCurrentUser().getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            db.collection("users").document(uid).get()
+            .addOnSuccessListener(doc -> {
+
+                String role = doc.getString("role");
+
+                getSharedPreferences("USER_DATA", MODE_PRIVATE)
+                        .edit()
+                        .putString("role", role)
+                        .apply();
+                // ==========================================================
+
+                if (role.equals("admin")) {
+                    startActivity(new Intent(this, AddWisataActivity.class));
+                } else {
                     startActivity(new Intent(this, MainActivity.class));
-                    finish();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Gagal: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                );
+                }
+
+                finish();
+            });
+        });
     }
 }

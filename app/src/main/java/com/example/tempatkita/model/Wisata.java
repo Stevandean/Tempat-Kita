@@ -1,31 +1,19 @@
 package com.example.tempatkita.model;
 
-import java.util.List;
+import java.io.Serializable;
 
-public class Wisata {
+public class Wisata implements Serializable {
     private String id;
     private String nama;
     private String lokasi;
     private String deskripsi;
-    private List<String> images; // multi gambar
-    private double rating;       // default 0
-    private boolean loved;       // <--- tambahan untuk favorite
+    private String gambarUrl;
+    private double rating;
+    private boolean loved;
 
-    public Wisata() {
-        // Firestore membutuhkan constructor kosong
-    }
+    public Wisata() {}
 
-    public Wisata(String id, String nama, String lokasi, String deskripsi, List<String> images, double rating, boolean loved) {
-        this.id = id;
-        this.nama = nama;
-        this.lokasi = lokasi;
-        this.deskripsi = deskripsi;
-        this.images = images;
-        this.rating = rating;
-        this.loved = loved;
-    }
-
-    // Getter & Setter
+    // GETTER & SETTER
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -38,12 +26,12 @@ public class Wisata {
     public String getDeskripsi() { return deskripsi; }
     public void setDeskripsi(String deskripsi) { this.deskripsi = deskripsi; }
 
-    public List<String> getImages() { return images; }
-    public void setImages(List<String> images) { this.images = images; }
+    public String getGambarUrl() { return gambarUrl; }
+    public void setGambarUrl(String gambarUrl) { this.gambarUrl = gambarUrl; }
 
     public double getRating() { return rating; }
     public void setRating(double rating) { this.rating = rating; }
 
-    public boolean isLoved() { return loved; }  // bisa pakai getLoved() juga
+    public boolean isLoved() { return loved; }
     public void setLoved(boolean loved) { this.loved = loved; }
 }

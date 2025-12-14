@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tempatkita.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -51,13 +54,21 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         auth.createUserWithEmailAndPassword(email, pass)
-                .addOnSuccessListener(a -> {
-                    Toast.makeText(this, "Registrasi Berhasil", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, LoginActivity.class));
-                    finish();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Gagal: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                );
+        .addOnSuccessListener(a -> {
+            String uid = auth.getCurrentUser().getUid();
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            HashMap<String, Object> user = new HashMap<>();
+            user.put("email", email);
+            user.put("role", "user");  // default user
+
+            db.collection("users").document(uid)
+                    .set(user)
+                    .addOnSuccessListener(unused -> {
+                        Toast.makeText(this, "Registrasi Berhasil", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(this, LoginActivity.class));
+                        finish();
+                    });
+        });
     }
 }

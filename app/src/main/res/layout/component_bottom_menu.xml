@@ -69,6 +69,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:textSize="@dimen/text_hero_subtitle"
+            android:src="@drawable/ic_user"
             app:tint="@color/text_secondary"/>
 
         <TextView

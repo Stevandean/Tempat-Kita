@@ -2,12 +2,9 @@ package com.example.tempatkita.data.firestore;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.example.tempatkita.model.Wisata;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 public class WisataRepository {
 
@@ -21,7 +18,8 @@ public class WisataRepository {
     }
 
     public void getAllWisata(OnListListener listener) {
-        db.collection(COLLECTION).get()
+        db.collection(COLLECTION)
+                .get()
                 .addOnSuccessListener(listener::onSuccess)
                 .addOnFailureListener(e -> listener.onError(e.getMessage()));
     }
@@ -32,37 +30,44 @@ public class WisataRepository {
         void onError(String error);
     }
 
-    public void addWisata(Wisata w, OnActionListener listener){
-        Map<String,Object> map = new HashMap<>();
+    public void addWisata(Wisata w, OnActionListener listener) {
+        Map<String, Object> map = new HashMap<>();
         map.put("nama", w.getNama());
         map.put("lokasi", w.getLokasi());
         map.put("deskripsi", w.getDeskripsi());
-        map.put("images", w.getImages());
+        map.put("gambarUrl", w.getGambarUrl());
         map.put("rating", w.getRating());
+        map.put("loved", w.isLoved());
 
-        db.collection(COLLECTION).add(map)
+        db.collection(COLLECTION)
+                .add(map)
                 .addOnSuccessListener(doc -> listener.onSuccess())
-                .addOnFailureListener(e->listener.onError(e.getMessage()));
+                .addOnFailureListener(e -> listener.onError(e.getMessage()));
     }
 
     // ================= UPDATE =================
-    public void updateWisata(String id, Wisata w, OnActionListener listener){
-        Map<String,Object> map = new HashMap<>();
+    public void updateWisata(String id, Wisata w, OnActionListener listener) {
+        Map<String, Object> map = new HashMap<>();
         map.put("nama", w.getNama());
         map.put("lokasi", w.getLokasi());
         map.put("deskripsi", w.getDeskripsi());
-        map.put("images", w.getImages());
+        map.put("gambarUrl", w.getGambarUrl());
         map.put("rating", w.getRating());
+        map.put("loved", w.isLoved());
 
-        db.collection(COLLECTION).document(id).update(map)
+        db.collection(COLLECTION)
+                .document(id)
+                .update(map)
                 .addOnSuccessListener(unused -> listener.onSuccess())
-                .addOnFailureListener(e->listener.onError(e.getMessage()));
+                .addOnFailureListener(e -> listener.onError(e.getMessage()));
     }
 
     // ================= DELETE =================
-    public void deleteWisata(String id, OnActionListener listener){
-        db.collection(COLLECTION).document(id).delete()
+    public void deleteWisata(String id, OnActionListener listener) {
+        db.collection(COLLECTION)
+                .document(id)
+                .delete()
                 .addOnSuccessListener(unused -> listener.onSuccess())
-                .addOnFailureListener(e->listener.onError(e.getMessage()));
+                .addOnFailureListener(e -> listener.onError(e.getMessage()));
     }
 }

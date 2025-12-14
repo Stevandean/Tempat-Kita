@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Tambah Wisata"
+                android:textColor="@color/text_primary"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:id="@+id/imgPreview"
+                android:layout_width="200dp"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_input"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp"/>
+
+            <Button
+                android:id="@+id/btnChooseImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload Gambar"/>
+
+            <EditText
+                android:id="@+id/edtNama"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Nama Wisata"
+                android:background="@drawable/bg_input"
+                android:paddingHorizontal="14dp"
+                android:layout_marginTop="20dp"/>
+
+            <EditText
+                android:id="@+id/edtLokasi"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Lokasi"
+                android:background="@drawable/bg_input"
+                android:paddingHorizontal="14dp"
+                android:layout_marginTop="10dp"/>
+
+            <EditText
+                android:id="@+id/edtKategori"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Kategori (Pantai, Gunung, etc)"
+                android:background="@drawable/bg_input"
+                android:paddingHorizontal="14dp"
+                android:layout_marginTop="10dp"/>
+
+            <EditText
+                android:id="@+id/edtDeskripsi"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:gravity="top"
+                android:hint="Deskripsi"
+                android:background="@drawable/bg_input"
+                android:padding="14dp"
+                android:layout_marginTop="10dp"/>
+
+            <Button
+                android:id="@+id/btnSimpan"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="Simpan Wisata"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/primary"
+                android:textSize="16sp"
+                android:layout_marginTop="20dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- MENU BAWAH SELALU MUNCUL -->
+    <include
+        android:id="@+id/bottomMenu"
+        layout="@layout/component_bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"/>
+</LinearLayout>
